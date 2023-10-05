@@ -36,7 +36,12 @@ export default function ToDos() {
     }
 
     function removeTodo({ index }) {
-        setTodos(todos.filter((v,idx) => idx!==index));
+        const todoToDelete = todos[index];
+        fetch(`/api/todos/${todoToDelete.id}`, { method: "DELETE" }).then((response) => {
+            return response.json().then(() => {
+                setTodos(todos.filter((v, idx) => idx !== index));
+            });
+        });
     }
 
     useEffect(() => {

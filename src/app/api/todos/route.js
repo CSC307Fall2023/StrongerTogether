@@ -33,3 +33,21 @@ export async function POST(request) {
   return NextResponse.json({error: 'not signed in'}, {status: 403});
 }
 
+export async function DELETE(request) {
+  const loggedInData = await checkLoggedIn();
+  if (loggedInData.loggedIn) {
+    const todoId = parseInt(request.nextUrl.query.id);
+    try {
+      const todoDelete = await prisma.toDo.delete({
+        where: {
+          id: todoId,
+          ownerId: loggedInData.user?.id
+        }
+      });
+      return NextResponse.json(todoDelete);
+    } catch (error) {
+      return NextResponse.json({ error: 'Cannot delete todo' }, { status: 400 });
+    }
+  }
+  return NextResponse.json({error: 'not signed in'}, {status: 403});
+}

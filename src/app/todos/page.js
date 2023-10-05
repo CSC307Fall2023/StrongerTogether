@@ -36,7 +36,12 @@ export default function ToDos() {
     }
 
     function removeTodo({ index }) {
-        setTodos(todos.filter((v,idx) => idx!==index));
+        const todoToDelete = todos[index];
+        fetch(`/api/todos/${todoToDelete.id}`, { method: "DELETE" }).then((response) => {
+            return response.json().then(() => {
+                setTodos(todos.filter((v, idx) => idx !== index));
+            });
+        });
     }
 
     useEffect(() => {
@@ -50,13 +55,24 @@ export default function ToDos() {
 
     const loadingItems = <CircularProgress/>;
 
+    function markTodoItem({ index }) {
+        const markedTodo = { ...todos[index], done: !todos[index].done };
+        fetch(`/api/todos/${markedTodo.id}`, {method: "PUT", body: JSON.stringify(markedTodo)}).then((response) => {
+            return response.json().then((newTodo) => {
+                const newTodos = [...todos];
+                newTodos[index] = newTodo;
+                setTodos(newTodos);
+            });
+        });
+    }
+
     const toDoItems = isLoading ? loadingItems : todos.map((todo, idx) => {
         return <ListItem key={idx} secondaryAction={
             <IconButton edge="end" onClick={() => removeTodo({index: idx})}><DeleteForever/></IconButton>   
         }>  
             <ListItemButton>
                 <ListItemIcon>
-                    <Checkbox checked={todo.done} disableRipple/>
+                    <Checkbox checked={todo.done} disableRipple onChange={() =>  markTodoItem({ index: idx })}/>
                 </ListItemIcon>
                 <ListItemText primary={todo.value}/>
             </ListItemButton>

@@ -12,6 +12,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { TextField } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+import { MarkEmailReadRounded } from '@mui/icons-material';
 
 export default function ToDos() {
 
@@ -31,12 +32,38 @@ export default function ToDos() {
                     setNewTodo('');
                 });
             });
-            
         }
     }
 
     function removeTodo({ index }) {
-        setTodos(todos.filter((v,idx) => idx!==index));
+        const toDoToRemove = todos[index];
+        // delete a todo item
+        fetch(`api/todos/${toDoToRemove.id}`, {method: "delete"}).then((response) => {
+            if (response.ok) {
+                setTodos(todos.filter((v,idx) => idx!==index))
+            }
+            else{
+                console.log("Error: Failed to Delete ToDo Item")
+            }
+        });
+    }
+
+    function markToDoAsDone({ index }) {
+        // mark a todo item as done and have it saved to the database
+        const toDoToMarkAsDone = { ...todos[index], done: !todos[index].done };
+        console.log(toDoToMarkAsDone)
+        fetch(`api/todos/${todos[index].id}`, { method: "PUT", body: JSON.stringify(toDoToMarkAsDone)})
+        .then(
+            (response) => {
+                if (response.ok) {
+                    return response.json().then((newTodo) => {
+                        const changedToDo = [...todos];
+                        changedToDo[index] = newTodo;
+                        setTodos(changedToDo);
+                    });
+                }
+            }
+        );
     }
 
     useEffect(() => {
@@ -56,7 +83,7 @@ export default function ToDos() {
         }>  
             <ListItemButton>
                 <ListItemIcon>
-                    <Checkbox checked={todo.done} disableRipple/>
+                    <Checkbox onClick={() => markToDoAsDone({index: idx})} checked={todo.done} disableRipple/>
                 </ListItemIcon>
                 <ListItemText primary={todo.value}/>
             </ListItemButton>

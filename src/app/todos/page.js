@@ -36,8 +36,23 @@ export default function ToDos() {
     }
 
     function removeTodo({ index }) {
+        const todoToRemove = todos[index];
         setTodos(todos.filter((v,idx) => idx!==index));
+        fetch(`api/todos/${todoToRemove}`, {method: "delete"}).then((response) => response.json());
     }
+
+    function markAsDone( { index }) {
+        const completedToDo = todos[index]
+        fetch(`api/todos/${completedToDo.id}`, {method: "put", body: JSON.stringify({value: [...todos, index], 
+            done: !completedToDo.done})}).then((response) => response.json())
+            
+        setTodos ((oldTodos) => {
+            const newTodos = [...oldTodos]
+            newTodos[index].done = !newTodos[index].done
+            return newTodos
+        });
+    }
+    
 
     useEffect(() => {
         fetch("/api/todos", { method: "get" }).then((response) => response.ok && response.json()).then(

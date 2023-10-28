@@ -32,20 +32,25 @@ model User {
   password             String
   email                String       @unique
   experience           String
-  verified             Boolean
-  ProfileImage         Bytes
+  verified             Boolean?
+  ProfileImage         Bytes?
   initiatedFriendships Friendship[] @relation("FriendshipInitiator")
   receivedFriendships  Friendship[] @relation("FriendshipRecipient")
   Interest             Interest[]
+  Post                 Post[]
+  Votes                Votes[]
+  Comment              Comment[]
+  HostEvents           Event[]      @relation("Host")
+  AttendingEvents      Event[]      @relation("Attendee") // many to many implicit relationship
 }
 
 model Friendship {
-  // model different friendship relationships
+  // model different friendship relationships using User1 -> User2 model 
   initiator   User             @relation("FriendshipInitiator", fields: [initiatorId], references: [id])
   initiatorId Int
   recipient   User             @relation("FriendshipRecipient", fields: [recipientId], references: [id])
   recipientId Int
-  status      FriendshipStatus @default(pending)
+  status      FriendshipStatus @default(PENDING)
 
   @@id([initiatorId, recipientId])
 }
@@ -58,19 +63,97 @@ model Interest {
   userId   Int
 }
 
-model Votes  {
-
-}
-
 model Post {
-  Id Int @id @default(autoincrement())
-  authorId Int
-  author User @relation(fields: [authorId], references: [id])
+  // contains data about the post and it's relationships. 
+  id              Int           @id @default(autoincrement())
+  postTitle       String
+  postDescription String
+  authorId        Int
+  author          User          @relation(fields: [authorId], references: [id])
+  Votes           Votes[]
+  Comment         Comment[]
+  PostFilters     PostFilters[]
 }
 
+model Votes {
+  // All the votes for forum post. Use this to aggregate total on a single post
+  id     Int      @id @default(autoincrement())
+  type   VoteType
+  postId Int
+  post   Post     @relation(fields: [postId], references: [id])
+  userId Int
+  user   User     @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId]) // user cannot vote multiple times on the same post
+}
+
+model Comment {
+  // comments on forum post
+  id      Int    @id @default(autoincrement())
+  comment String
+  postId  Int
+  post    Post   @relation(fields: [postId], references: [id])
+  userId  Int
+  user    User   @relation(fields: [userId], references: [id])
+}
+
+model PostFilters {
+  // all the post filters for certain post
+  id               Int             @id @default(autoincrement())
+  postId           Int
+  post             Post            @relation(fields: [postId], references: [id])
+  possibleFilterId Int
+  possibleFilter   PossibleFilters @relation(fields: [possibleFilterId], references: [id])
+
+  @@unique([postId, possibleFilterId])
+}
+
+model PossibleFilters {
+  // possible filters for post and events
+  id          Int           @id @default(autoincrement())
+  filterType  String        @unique
+  PostFilters PostFilters[]
+  EventFilter EventFilter[]
+}
+
+model Event {
+  id            Int           @id @default(autoincrement())
+  eventName     String
+  location      String
+  startTime     DateTime
+  endTime       DateTime
+  maxAttendee   Int
+  hostId        Int           @unique
+  host          User          @relation("Host", fields: [hostId], references: [id])
+  EventFilter   EventFilter[]
+  EventAttendee User[]        @relation("Attendee") // many to many implicit relationship
+}
+
+model EventFilter {
+  id               Int             @id @default(autoincrement())
+  eventId          Int
+  Event            Event           @relation(fields: [eventId], references: [id])
+  possibleFilterId Int
+  possibleFilter   PossibleFilters @relation(fields: [possibleFilterId], references: [id])
+
+  @@unique([eventId, possibleFilterId])
+}
+
+model Equipments {
+  id            Int    @id @default(autoincrement())
+  equipmentName String
+  description   String
+}
+
+// all the enum types
 enum FriendshipStatus {
-  pending
-  accepted
-  declined
-  blocked
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
 }

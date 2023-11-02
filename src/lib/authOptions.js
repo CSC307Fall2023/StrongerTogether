@@ -10,7 +10,7 @@ const authOptions = {
     async authorize({email = '', password}) {
       console.log("credentials: ", email, password);
       try {
-        const user = await prisma.user.findFirst({
+        const user = await prisma.User.findFirst({
           where: {
             email: {
               equals: email

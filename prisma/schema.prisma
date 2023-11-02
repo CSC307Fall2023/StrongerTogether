@@ -31,7 +31,7 @@ model User {
   name                 String
   password             String
   email                String       @unique
-  experience           String
+  experience           String?
   verified             Boolean?
   ProfileImage         Bytes?
   initiatedFriendships Friendship[] @relation("FriendshipInitiator")

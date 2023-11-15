@@ -10,17 +10,174 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model User {
+//   id  Int @id @default(autoincrement())
+//   email String @unique
+//   password String 
+//   toDos ToDo[]
+// }
+
+// model ToDo {
+//   id Int @id @default(autoincrement())
+//   value String
+//   done Boolean
+//   owner User @relation(fields: [ownerId], references: [id])
+//   ownerId Int 
+// }
+
 model User {
-  id  Int @id @default(autoincrement())
-  email String @unique
-  password String 
-  toDos ToDo[]
+  // model the user and the profiles
+  id                   Int             @id @default(autoincrement())
+  name                 String
+  password             String
+  email                String          @unique
+  status               Status          @default(PUBLIC)
+  gymFrequency         String?
+  verified             Boolean?
+  shortBio             String?
+  ProfileImage         Bytes?
+  initiatedFriendships Friendship[]    @relation("FriendshipInitiator")
+  receivedFriendships  Friendship[]    @relation("FriendshipRecipient")
+  Interest             Interest[]
+  Post                 Post[]
+  Votes                Votes[]
+  Comment              Comment[]
+  HostEvents           Event[]
+  // AttendingEvents      Event[]         @relation("Attendee") // many to many implicit relationship
+  EventAttendee        EventAttendee[]
 }
 
-model ToDo {
-  id Int @id @default(autoincrement())
-  value String
-  done Boolean
-  owner User @relation(fields: [ownerId], references: [id])
-  ownerId Int 
+model Friendship {
+  // model different friendship relationships using User1 -> User2 model 
+  initiator   User             @relation("FriendshipInitiator", fields: [initiatorId], references: [id])
+  initiatorId Int
+  recipient   User             @relation("FriendshipRecipient", fields: [recipientId], references: [id])
+  recipientId Int
+  status      FriendshipStatus @default(PENDING)
+
+  @@id([initiatorId, recipientId])
+}
+
+model Interest {
+  // model different interst of userse
+  Id       Int    @id @default(autoincrement())
+  interest String
+  user     User   @relation(fields: [userId], references: [id])
+  userId   Int
+}
+
+model Post {
+  // contains data about the post and it's relationships. 
+  id              Int           @id @default(autoincrement())
+  postTitle       String
+  postDescription String
+  authorId        Int
+  author          User          @relation(fields: [authorId], references: [id])
+  createdAt       DateTime      @default(now()) // creation time
+  Votes           Votes[]
+  Comment         Comment[]
+  PostFilters     PostFilters[]
+}
+
+model Votes {
+  // All the votes for forum post. Use this to aggregate total on a single post
+  id     Int      @id @default(autoincrement())
+  type   VoteType
+  postId Int
+  post   Post     @relation(fields: [postId], references: [id])
+  userId Int
+  user   User     @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId]) // user cannot vote multiple times on the same post
+}
+
+model Comment {
+  // comments on forum post
+  id        Int      @id @default(autoincrement())
+  comment   String
+  postId    Int
+  createdAt DateTime @default(now()) // creation time
+  post      Post     @relation(fields: [postId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model PostFilters {
+  // all the post filters for certain post
+  id               Int             @id @default(autoincrement())
+  postId           Int
+  post             Post            @relation(fields: [postId], references: [id])
+  possibleFilterId Int
+  possibleFilter   PossibleFilters @relation(fields: [possibleFilterId], references: [id])
+
+  @@unique([postId, possibleFilterId])
+}
+
+model PossibleFilters {
+  // possible filters for post and events
+  id          Int           @id @default(autoincrement())
+  filterType  String        @unique
+  PostFilters PostFilters[]
+  EventFilter EventFilter[]
+}
+
+model Event {
+  id            Int             @id @default(autoincrement())
+  eventName     String
+  location      String
+  startTime     DateTime
+  endTime       DateTime
+  maxAttendee   Int
+  hostId        Int             @unique
+  host          User            @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  EventFilter   EventFilter[]
+  // EventAttendee User[]          @relation("Attendee") // many to many implicit relationship
+  EventAttendee EventAttendee[]
+}
+
+model EventAttendee {
+  // explicit event attendee table
+  id      Int   @id @default(autoincrement())
+  eventId Int
+  userId  Int
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade) // event will be deleted if connected event is deleted
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade) // event will be deleted if connected user is deleted
+
+  @@unique([eventId, userId]) // can't have same user be interested in the same event
+}
+
+model EventFilter {
+  id               Int             @id @default(autoincrement())
+  eventId          Int
+  Event            Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  possibleFilterId Int
+  possibleFilter   PossibleFilters @relation(fields: [possibleFilterId], references: [id])
+
+  @@unique([eventId, possibleFilterId])
+}
+
+model Equipments {
+  id                Int    @id @default(autoincrement())
+  equipmentName     String
+  short_description String
+  long_description  String
+  image_path        String
+}
+
+// all the enum types
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
+}
+
+enum Status {
+  PUBLIC
+  PRIVATE
 }

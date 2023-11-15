@@ -2,73 +2,73 @@
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
-import AdbIcon from '@mui/icons-material/Adb';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import NavBar from './NavBar';
-import Login from './Login';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Signup from './Signup';
-import { useSession } from 'next-auth/react';
-import { Button } from '@mui/material';
-import { signOut } from "next-auth/react"
+import { useSession, getSession, signOut} from 'next-auth/react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import './globals.css';
 
 const theme = createTheme({});
 
 export default function RootLayout({ children, title }) {
-
   const { data: session, status }  = useSession();
+  const isLoggedIn = status === 'authenticated';
+  const isLoginPage = usePathname() === '/login';
+  const router = useRouter();
 
-  let loginSection;
+  if (session && session.isExpired) {
+    signOut({ redirect: false });
+  }
 
-  if (status === 'authenticated') {
-    loginSection = <Button variant="outlined" color="inherit" onClick={() => signOut()}>Sign Out</Button>;
-  } else {
-    loginSection = <>
-      <Login/>
-      <Signup/>
-    </>;
+  useEffect(() => {
+    if (status === 'loading') return; // loading
+
+    if (!isLoggedIn && !isLoginPage) {
+      router.push("/login");
+    } else if (isLoggedIn && isLoginPage) {
+      router.push("/");
+    }
+  }, [status, isLoginPage]);
+
+  if (isLoginPage) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box component="main" sx={{ p: 0 }}>
+          {children}
+        </Box>
+      </ThemeProvider>
+    );
   }
 
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <AppBar position="static">
+        <AppBar className="fullNav" position="static">
           <Container maxWidth="xl">
+          
             <Toolbar disableGutters>
-              <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-              <Typography
-                variant="h6"
-                noWrap
-                component="a"
-                href="/"
-                sx={{
-                  mr: 2,
-                  display: { xs: 'none', md: 'flex' },
-                  fontFamily: 'monospace',
-                  fontWeight: 700,
-                  letterSpacing: '.3rem',
-                  color: 'inherit',
-                  textDecoration: 'none',
-                }}
-              >
-                {title}
+              
+              <Typography variant="h5" component="a" href="/" className="title-text">
+              Stronger<br />Together
               </Typography>
+              <Typography variant="h6" component="a" href="/" className="slogan-text">
+              Lift, Laugh, Love
+              </Typography>
+
               <NavBar />
-              <Box sx={{ flexGrow: 0 }}>
-                <Stack direction='row' spacing={2}>
-                  {loginSection}
-                </Stack>
-              </Box>
+      
             </Toolbar>
           </Container>
         </AppBar>
       </Box>
-      <Box component="main" sx={{ p: 3 }}>
+      <Box component="main" sx={{ p: 3 }} className="main-content">
         {children}
       </Box>
     </ThemeProvider>

@@ -11,6 +11,8 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import EventIcon from '@mui/icons-material/Event';
+import { Card, CardContent, Container, Paper, Typography } from "@mui/material";
+import '../globals.css';
 
 const Events = () => {
     const [events, setEvents] = useState([]);
@@ -18,6 +20,7 @@ const Events = () => {
     const [newEvent, setNewEvent] = useState({
         title: '',
         creator: '',
+        date: '',
         startTime: '',
         endTime: '',
         location: '',
@@ -32,12 +35,19 @@ const Events = () => {
     const userId = '123'; // simulated current userID
 
     const [editIndex, setEditIndex] = useState(null);
+
+    // track user interactions
+    const [userInteractions, setUserInteractions] = useState({});
+
+
     const [editEvent, setEditEvent] = useState({
         title: '',
         creator: '',
+        date: '',
         startTime: '',
         endTime: '',
         location: '',
+        attendees: 0,
         interestedCount: 0,
         goingCount: 0,
         creatorId: ''
@@ -98,6 +108,7 @@ const Events = () => {
         setNewEvent({
             title: '',
             creator: '',
+            date: '',
             startTime: '',
             endTime: '',
             location: '',
@@ -155,9 +166,6 @@ const Events = () => {
             }),
           });
     };
-
-    // track user interactions
-    const [userInteractions, setUserInteractions] = useState({});
 
     // Function to handle "Interested" click
     const handleInterested = (index) => {

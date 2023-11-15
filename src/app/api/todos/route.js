@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { checkLoggedIn } from "@/lib/auth";
+import { USER_NOT_SIGNED_IN } from "@/lib/response";
 
 export async function GET(request) {
   const loggedInData = await checkLoggedIn();
@@ -14,7 +15,7 @@ export async function GET(request) {
     });
     return NextResponse.json(todos);
   }
-  return NextResponse.json({error: 'not signed in'}, {status: 403});
+  return USER_NOT_SIGNED_IN;
 }
 
 export async function POST(request) {
@@ -30,6 +31,6 @@ export async function POST(request) {
     });
     return NextResponse.json(todo);
   }
-  return NextResponse.json({error: 'not signed in'}, {status: 403});
+  return USER_NOT_SIGNED_IN;
 }
 

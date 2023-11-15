@@ -1,0 +1,138 @@
+
+.profile-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/*.main-content {
+    margin-left: 150px;
+    background-color: #003832f3;
+  }*/
+
+.profile-form {
+    text-align: center;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 20px;
+    border: 3px black;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    /*max-width: 1500px;*/
+    min-height: 50px;
+    height: 100vh;
+    width: 100%;
+    margin-top: 1%;
+}
+
+.profile-photo{
+    position:relative
+}
+
+.profile-photo img {
+    max-width: 150px;
+    height: 150px;
+    border-radius: 70%;
+    display: block;
+    margin-bottom: 10px;
+    position:relative
+}
+
+.spacing {
+    position:relative;
+    margin-top: 10px;
+}
+
+.font {
+    font-size:x-large;
+    top: 15px;
+}
+
+.middle {
+    text-align: left;
+    margin-top: 5%;
+}
+
+.profile-photo input[type="file"] {
+    display: none;
+}
+
+
+
+input[type="file"] {
+    cursor: pointer;
+}
+
+
+.select-wrapper {
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+}
+
+.select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  outline: none;
+}
+
+
+/* Style the options */
+.select-wrapper select option {
+  padding: 15px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Hover effect on options */
+.select-wrapper select option:hover {
+  background-color: #f0f0f0;
+}
+
+.option-frequency{
+    text-align: center;
+}
+
+.bottom-cards-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.bottom-cards-container > div {
+    width: 100%;
+    margin-right: 10px;
+    margin-left: 10px;
+    box-shadow: 0 0 4px #003831;
+    /*border: 1px solid #A89968;*/
+    height: auto;
+    
+    transition: transform 0.5s ease-in-out, box-shadow 0.3s ease-in-out;
+
+    &:hover {
+        transform: scale(1.2); 
+        box-shadow: 0 0 15px #A89968;
+    }
+}
+
+
+.eventContent .title {
+    font-weight: bold; 
+}
+
+.eventContent .body {
+    color: #5b5959
+}
+

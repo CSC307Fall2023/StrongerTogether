@@ -1,0 +1,548 @@
+/* Root directory with custom CSS variables */
+:root {
+  --white: #ffffff;
+  --green: #003831;
+  --gold: #A89968;
+  --black: #000000;
+  --hover-green: #004e45;
+  --font-family: "Abolition Regular", sans-serif;
+}
+
+/* Body Styles */
+body {
+  background-color: var(--white);
+  color: var(--black);
+  font-family: var(--font-family);
+}
+
+/* Full Navigation Styles */
+.fullNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 150px;
+  background-color: var(--green);
+}
+
+/* Full Navigation Container Styles */
+.fullNav .MuiContainer-root {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Full Navigation AppBar Styles */
+.fullNav .MuiAppBar-root {
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+  width: 150px;
+}
+
+/* Full Navigation Box Styles */
+.fullNav .MuiBox-root.css-k008qs {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 150px;
+  background-color: var(--green);
+}
+
+/* Full Navigation Toolbar Styles */
+.fullNav .MuiToolbar-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+/* Typography Styles */
+.fullNav .MuiTypography-root {
+  margin-bottom: auto;
+  color: var(--gold);
+  z-index: 1;
+}
+
+/* Navbar Button Styles */
+.navbar-container .navbar-button {
+  color: var(--white);
+  background-color: var(--black);
+  width: 120px;
+  padding: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  margin: 8px 0;
+  text-align: center;
+  transition: background-color 0.2s;
+}
+
+/* Navbar Button Layout */
+.navbar-container {
+  margin-bottom: 40px;
+}
+
+/* Navbar Button Hover Styles */
+.navbar-container .navbar-button:hover {
+  background-color: #004e45;
+}
+
+/* Full Navigation Box Styles */
+.fullNav .MuiBox-root {
+  margin-top: auto;
+  z-index: 1;
+}
+
+/* Navbar */
+.fullNav .MuiAppBar-root {
+  background: var(--green);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 150px;
+  height: 100%;
+}
+
+/* Toolbar Styles */
+.fullNav .MuiAppBar-root > .MuiToolbar-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+/* Typography Styles */
+.fullNav .MuiAppBar-root > .MuiToolbar-root > .MuiTypography-root {
+  margin-bottom: auto;
+  color: var(--black);
+  z-index: 1;
+}
+
+/* Typography Link Styles */
+.fullNav .MuiAppBar-root > .MuiToolbar-root > .MuiTypography-root > a {
+  text-decoration: none;
+  color: var(--black);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Navbar Button Styles */
+.fullNav .MuiAppBar-root > .navbar-container .navbar-button {
+  color: var(--black);
+  background-color: var(--green);
+  width: 100%;
+  padding: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  margin: 8px 0;
+  text-align: center;
+  transition: background-color 0.5s;
+}
+
+/* Title Text Styles */
+.fullNav .title-text {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  margin: 0px;
+  border-bottom: 3px solid var(--black);
+  font-weight: bold;
+}
+
+/* Slogan Text Styles */
+.fullNav .slogan-text {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-size: 90%;
+}
+
+/* Main Content Styles */
+.main-content {
+  margin-left: 150px;
+  background-color: var(--white);
+}
+
+/* Events Styles */
+.events-container {
+  background-color: var(--white);
+  margin-top: 5px;
+  padding: 10px;
+}
+
+.events-title {
+  text-align: center;
+  background-color: var(--green);
+  color: white;
+  padding: 25px;
+  padding-bottom: 25px;
+}
+
+.events-button {
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px; /* Adjust padding to increase button size */
+  font-size: 16px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.events-button:hover {
+  background: var(--green); 
+  transform: scale(1.02); 
+  color: white;
+}
+
+.events-info-button {
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  margin: 0 10px;
+}
+
+.events-info-button:hover {
+  background: var(--green); /* Darken the background color on hover */
+  transform: scale(1.02); /* Slightly scale up the button on hover */
+  color: white;
+}
+
+.events-description {
+  color: black;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.events-name {
+  font-size: 1.25rem;
+  color: var(--black);
+}
+
+/* Root Equipment Page Styles */
+.equipment-container {
+  background-color: var(--white);
+  margin-top: 5px;
+  padding: 10px;
+}
+
+.equipment-title {
+  text-align: center;
+  background-color: var(--green);
+  color: var(--white);
+  padding: 20px;
+  padding-bottom: 25px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+}
+
+.equipment-tab {
+  margin-top: 0px;
+  margin-bottom: 20px;
+}
+/* Equipment Box Styles */
+.equipment-box {
+  position: relative;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px;
+  height: 300px;
+  background-color: #f4f4f4; /* Add a background color */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle box shadow */
+  transition: transform 0.2s; /* Add a transform transition for hover effect */
+}
+
+.equipment-box:hover {
+  transform: scale(1.05); /* Slightly scale up the box on hover */
+}
+
+.equipment-image {
+  width: 100%;
+}
+
+.equipment-name {
+  font-size: 1.25rem;
+  color: var(--black);
+}
+
+.equipment-description {
+  color: black;
+}
+
+.equipment-button {
+  background: var(--black);
+  color: white;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.equipment-button:hover {
+  background: #010101; /* Darken the background color on hover */
+  transform: scale(1.02); /* Slightly scale up the button on hover */
+  color: white;
+}
+
+.pagination-container{
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+  padding-bottom: 25px;
+}
+
+
+.equipment-box-expanded {
+  padding: 10px;
+  border-radius: 10px;
+  height: 100%;
+}
+
+.equipment-expanded .equipment-button {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  width: 85%;
+  transform: translateX(7.8%); /* Center the button horizontally */
+  font-size: 14px; /* Adjust the font size to make the button smaller */
+  padding: 5px 10px; /* Adjust the padding to change the button size */
+}
+
+
+.grid-container {
+  background-color: white;
+}
+
+.equipment-expanded {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; /* Adjust the width based on your preference */
+  height: 94%; /* Adjust the height based on your preference */
+  z-index: 2;
+  background-color: white;
+  border-radius: 10px;
+}
+
+
+
+.grid-container {
+  background-color: white;
+  position: relative;
+}
+
+.equipment-expanded .equipment-box {
+  padding: 10px;
+  border-radius: 10px;
+  height: 100%;
+  transform: none;
+}
+
+.equipment-expanded .equipment-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+
+/* Forum.css */
+/* Apply the following CSS to your Forum component */
+
+.forum-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.forum-title {
+  background-color: var(--green); /* Change the color to your preference */
+  width: 90%;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  text-align: center;
+  color: var(--white); /* Text color for the banner */
+  font-size: 24px; /* Adjust font size as needed */
+}
+
+
+.forum-body {
+  display: flex;
+  width: 90%;
+  align-items: left;
+  justify-content: center; /* Adjust as needed */ 
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .forum-body {
+    flex-direction: column; /* Stack elements vertically on smaller screens */
+  }
+  .forum-side-boxes {
+    width: 100%; /* Make side boxes take full width on smaller screens */
+  }
+}
+
+
+.forum-side-boxes {
+  flex: 1; 
+  margin-right: 20px;
+  text-align: left;
+  min-width: 140px;
+}
+
+
+.new-post-box {
+  width: 100%;
+  box-shadow: 0 8px 12px rgba(0.4, 0.4, 0.4, 0.4); /* Adjust shadow properties as needed */
+  transition: transform 0.2s; /* Add a transition for smooth scaling */
+}
+
+.new-post-box:hover {
+  transform: scale(1.04); /* Scale up by 5% on hover */
+  background-color: var(--hover-green);
+}
+
+
+.filters-box, .my-options-box, .new-post-box {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: var(--green); 
+  border: 5px;
+  border-radius: 10px;
+  text-align: center;
+  color: var(--white);
+}
+
+.filters-box h2, .my-options-box h2, .new-post-box h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.my-options-box {
+  margin: 5px 0;
+  font-size: 16px; 
+  align-items: center;
+}
+
+.option-buttons {
+  background-color: var(--green);
+  display: flex;
+  flex-direction: column; /* Align items in a vertical column */
+}
+
+.forum-post-container {
+  display: grid;
+  flex-wrap: wrap;
+  gap: 20px;
+  min-width: 86%;
+}
+
+.forum-post {
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 10px;
+  text-align: left;
+  margin-bottom: 20px;
+  display: flex; 
+  flex-wrap: wrap;
+}
+
+.post-details{
+  width: 60%;
+  margin-left: 20px;
+  min-width: 320px;
+}
+.post-title {
+  font-size: 20px;
+}
+
+.post-author-tags { 
+  display: flex;
+  flex-direction: column;
+}
+
+
+.post-actions {
+  display: flex;
+  width: 35%;
+  align-items: center;
+  min-width: 150px;
+  justify-content: right;
+}
+
+.like-button, .dislike-button, .comment-button, .flag-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  margin: 5px;
+  height: 40%;
+  min-height: 40px;
+  min-width: 55px;
+  width: 60px;
+  border: 1px solid black;
+  border-radius: 10px;
+  transition: transform 0.1s;
+}
+
+.like-button:hover, .dislike-button:hover, .comment-button:hover, .flag-button:hover {
+  transform: scale(1.02);
+  background-color: rgb(219, 219, 219);
+}
+
+
+.my-posts-button,
+.my-saved-button,
+.my-drafts-button {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  transition: all 0.2s;
+  justify-content: center;
+  color: white;
+}
+
+.my-posts-button:hover,
+.my-saved-button:hover,
+.my-drafts-button:hover {
+  background-color: var(--hover-green); /* Add a background color on hover */
+  border-radius: 5px; /* Add rounded corners on hover */
+}
+
+.action-count {
+  margin-left: 5px;
+  font-weight: bold;
+}
+

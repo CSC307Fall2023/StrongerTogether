@@ -7,9 +7,8 @@ import { checkLoggedIn } from "@/lib/auth";
 export async function PUT(request, { params }) {
   // delete events and cascade delete all the event attendees
   const loggedInData = await checkLoggedIn();
-  loggedInData.id
-  const responseData = await request.json();
-  if (true) {
+  if (loggedInData.loggedIn) {
+    const responseData = await request.json();
     const {
       name, shortBio, photo, ProfileImage
     } = responseData;

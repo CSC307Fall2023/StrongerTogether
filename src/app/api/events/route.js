@@ -4,9 +4,10 @@ import { checkLoggedIn } from "@/lib/auth";
 import { USER_NOT_SIGNED_IN } from "@/lib/response";
 
 export async function POST(request) {
-  // const loggedInData = await checkLoggedIn();
-  if (true) {
+  const loggedInData = await checkLoggedIn();
+  if (loggedInData.loggedIn) {
     // if user is logged in, then create the event if needed
+    const userId = loggedInData.user.id;
     const responseData = await request.json();
     const { eventName, location, startTime, endTime, maxAttendee, filterIds } =
       responseData;
@@ -16,7 +17,7 @@ export async function POST(request) {
       startTime: startTime,
       endTime: endTime,
       maxAttendee: parseInt(maxAttendee),
-      hostId: 1, // Change this to something more dynamic
+      hostId: userId,
     };
     
     // Check if filterIds array is not empty
@@ -31,24 +32,6 @@ export async function POST(request) {
         })),
       };
     }
-    // const eventData = {
-    //   eventName: eventName,
-    //   location: location,
-    //   startTime: startTime,
-    //   endTime: endTime,
-    //   maxAttendee: maxAttendee,
-    //   hostId: 1, // change this to something more dynamic
-    //   EventFilter: {
-    //     // add filters to the events and connect them to existing possible filters
-    //     create: filterIds.map((id) => ({
-    //       possibleFilter: {
-    //         connect: {
-    //           id: id,
-    //         },
-    //       },
-    //     })),
-    //   },
-    // };
     console.log(eventData);
     let events;
     try {
@@ -66,9 +49,9 @@ export async function POST(request) {
 
 export async function GET(request) {
   // send in GET request as query in URL
-  // const loggedInData = await checkLoggedIn();
+  const loggedInData = await checkLoggedIn();
   // const { id } = router.query;
-  if (true) {
+  if (loggedInData.loggedIn) {
     const searchParams = request.nextUrl.searchParams;
     // Get all 'filters' query parameters as an array
     let filters = searchParams.getAll("filters");
@@ -119,8 +102,9 @@ export async function GET(request) {
 
 export async function DELETE(request) {
   // delete events and cascade delete all the event attendees
-  const responseData = await request.json();
-  if (true) {
+  const loggedInData = await checkLoggedIn();
+  if (loggedInData.loggedIn) {
+    const responseData = await request.json();
     const { id } = responseData;
     let eventDeleted;
     try {
@@ -140,8 +124,9 @@ export async function DELETE(request) {
 
 export async function PATCH(request) {
   // delete events and cascade delete all the event attendees
-  const responseData = await request.json();
-  if (true) {
+  const loggedInData = await checkLoggedIn();
+  if (loggedInData.loggedIn) {
+    const responseData = await request.json();
     const {
       id,
       eventName,

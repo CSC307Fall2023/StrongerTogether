@@ -21,7 +21,7 @@ export async function POST(request) {
       postTitle: postTitle,
       postDescription: postDescription,
       authorId: 1, // change this to something more dynamic
-      postFilters: {
+      PostFilters: {
         create: filterIds.map((id) => ({
           possibleFilter: {
             connect: {
@@ -95,65 +95,6 @@ export async function GET(request) {
         FROM "total_votes"
         LEFT JOIN "filters" ON "total_votes"."id" = "filters"."postId"
       `;
-
-      // console.log(forums);
-      // // if no filter, return everything
-      // allPost = await prisma.Post.findMany({
-      //   // include everything since you're going to parse and create post
-      //   include: {
-      //     Comment: true,
-      //   },
-      //   orderBy: {
-      //     createdAt: "desc", // order by newest
-      //   },
-      // });
-      // const postIds = allPost.map((post) => post.id); // get all the postIds
-      // postVotes = await prisma.Votes.groupBy({
-      //   by: ["postId", "type"],
-      //   where: {
-      //     postId: {
-      //       in: postIds,
-      //     },
-      //   },
-      //   _count: {
-      //     type: true,
-      //   },
-      //   orderBy: [{ postId: "desc" }, { type: "asc" }], // upvotes will always come before downvotes
-      // });
-      // console.log(postVotes);
-      // // Create a map for quick ID-based lookup for one of the arrays, say array2
-      // const voteMap = new Map();
-      // postVotes.forEach((vote) => {
-      //   if (!voteMap.has(vote.postId)) {
-      //     voteMap.set(vote.postId, []);
-      //   }
-      //   // votesAssociatedWithPost = votesAssociatedWithPost.map((votes) => (votes.type === "UPVOTE" ? {upvotes: votes} : {downvotes: votes}))
-      //   voteMap.get(vote.postId).push(vote);
-      // });
-
-      // console.log(JSON.stringify([...voteMap.entries()], null, 2));
-      // // Combine arrays
-      // combinedArray = allPost.map((post) => {
-      //   let votesAssociatedWithPost = voteMap.get(post.id);
-      //   if (votesAssociatedWithPost) {
-      //     let totalVote =
-      //       votesAssociatedWithPost[0]["_count"]["type"] -
-      //       votesAssociatedWithPost[1]["_count"]["type"];
-      //     totalVote = totalVote < 0 ? 0 : totalVote;
-      //     console.log("totalVote1 " + totalVote);
-      //     return {
-      //       ...post,
-      //       totalVote,
-      //     };
-      //   } else {
-      //     return {
-      //       ...post,
-      //       totalVote: 0, // no votes found
-      //     };
-      //   }
-      // });
-      // console.log(postIds)
-      // console.log(combinedArray);
     } catch (e) {
       console.log(e.message);
       return NextResponse.json({ error: e.message }, { status: 500 });

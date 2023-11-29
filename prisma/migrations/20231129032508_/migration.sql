@@ -4,14 +4,19 @@ CREATE TYPE "FriendshipStatus" AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED', 'BLOC
 -- CreateEnum
 CREATE TYPE "VoteType" AS ENUM ('UPVOTE', 'DOWNVOTE');
 
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('PUBLIC', 'PRIVATE');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "experience" TEXT,
+    "status" "Status" NOT NULL DEFAULT 'PUBLIC',
+    "gymFrequency" TEXT,
     "verified" BOOLEAN,
+    "shortBio" TEXT,
     "ProfileImage" BYTEA,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -41,6 +46,7 @@ CREATE TABLE "Post" (
     "postTitle" TEXT NOT NULL,
     "postDescription" TEXT NOT NULL,
     "authorId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
 );
@@ -60,6 +66,7 @@ CREATE TABLE "Comment" (
     "id" SERIAL NOT NULL,
     "comment" TEXT NOT NULL,
     "postId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" INTEGER NOT NULL,
 
     CONSTRAINT "Comment_pkey" PRIMARY KEY ("id")
@@ -96,6 +103,15 @@ CREATE TABLE "Event" (
 );
 
 -- CreateTable
+CREATE TABLE "EventAttendee" (
+    "id" SERIAL NOT NULL,
+    "eventId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+
+    CONSTRAINT "EventAttendee_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "EventFilter" (
     "id" SERIAL NOT NULL,
     "eventId" INTEGER NOT NULL,
@@ -115,12 +131,6 @@ CREATE TABLE "Equipments" (
     CONSTRAINT "Equipments_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "_Attendee" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -137,13 +147,10 @@ CREATE UNIQUE INDEX "PossibleFilters_filterType_key" ON "PossibleFilters"("filte
 CREATE UNIQUE INDEX "Event_hostId_key" ON "Event"("hostId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "EventAttendee_eventId_userId_key" ON "EventAttendee"("eventId", "userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "EventFilter_eventId_possibleFilterId_key" ON "EventFilter"("eventId", "possibleFilterId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_Attendee_AB_unique" ON "_Attendee"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_Attendee_B_index" ON "_Attendee"("B");
 
 -- AddForeignKey
 ALTER TABLE "Friendship" ADD CONSTRAINT "Friendship_initiatorId_fkey" FOREIGN KEY ("initiatorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -176,19 +183,19 @@ ALTER TABLE "PostFilters" ADD CONSTRAINT "PostFilters_postId_fkey" FOREIGN KEY (
 ALTER TABLE "PostFilters" ADD CONSTRAINT "PostFilters_possibleFilterId_fkey" FOREIGN KEY ("possibleFilterId") REFERENCES "PossibleFilters"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Event" ADD CONSTRAINT "Event_hostId_fkey" FOREIGN KEY ("hostId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Event" ADD CONSTRAINT "Event_hostId_fkey" FOREIGN KEY ("hostId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "EventFilter" ADD CONSTRAINT "EventFilter_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "EventAttendee" ADD CONSTRAINT "EventAttendee_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EventAttendee" ADD CONSTRAINT "EventAttendee_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EventFilter" ADD CONSTRAINT "EventFilter_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "EventFilter" ADD CONSTRAINT "EventFilter_possibleFilterId_fkey" FOREIGN KEY ("possibleFilterId") REFERENCES "PossibleFilters"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_Attendee" ADD CONSTRAINT "_Attendee_A_fkey" FOREIGN KEY ("A") REFERENCES "Event"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_Attendee" ADD CONSTRAINT "_Attendee_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 INSERT INTO "Equipments" ("equipmentName", "short_description", "long_description", "image_path") 
 VALUES 
@@ -202,3 +209,7 @@ VALUES
 ('Elliptical Trainer', 'Compact Elliptical', 'Space-efficient elliptical trainer for low-impact cardio', '/images/elliptical.jpg'),
 ('Foam Roller', 'Muscle Roller', 'High-density foam roller for muscle recovery and flexibility', '/images/foam_roller.jpg'),
 ('Punching Bag', 'Heavy Punching Bag', 'Durable heavy bag for boxing and martial arts training', '/images/punching_bag.jpg');
+
+INSERT INTO "User" ("name", "password", "email")
+VALUES
+('admin', '$2a$10$ApKSbcr80X.AvrZn5HhxY.59TkwXrUyUbz6ZHRXhSNJFoOGEyTSLe', 'admin@calpoly.edu')

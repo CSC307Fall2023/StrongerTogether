@@ -15,7 +15,7 @@ export async function POST(request) {
       location: location,
       startTime: startTime,
       endTime: endTime,
-      maxAttendee: maxAttendee,
+      maxAttendee: parseInt(maxAttendee),
       hostId: 1, // Change this to something more dynamic
     };
     

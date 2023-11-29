@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Paper, Typography, Button, Grid, Box } from '@mui/material';
 import { Pagination, PaginationItem } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -10,45 +10,23 @@ export default function Equipment() {
   const itemsPerPage = 6;
   const [page, setPage] = useState(1);
   const [expandedEquipment, setExpandedEquipment] = useState(null);
+  const [equipmentData, setEquipmentData] = useState([]);
 
-  const equipmentData = [
-    {
-      id: 1,
-      name: 'Treadmill',
-      description: 'A cardio machine for running or walking indoors.',
-      image: 'treadmill.jpg',
-    },
-    {
-      id: 2,
-      name: 'Elliptical Trainer',
-      description: 'Low-impact machine for full-body workouts.',
-      image: 'elliptical.jpg',
-    },
-    {
-      id: 3,
-      name: 'Stationary Bike',
-      description: 'Great for cardiovascular workouts and leg strength.',
-      image: 'stationary-bike.jpg',
-    },
-    {
-      id: 4,
-      name: 'Leg Press Machine',
-      description: 'Strengthens leg muscles and glutes.',
-      image: 'leg-press.jpg',
-    },
-    {
-      id: 5,
-      name: 'Chest Press Machine',
-      description: 'Targets chest and triceps muscles.',
-      image: 'chest-press.jpg',
-    },
-    {
-      id: 6,
-      name: 'Lat Pulldown Machine',
-      description: 'Works the upper back and biceps.',
-      image: 'lat-pulldown.jpg',
-    },
-  ];
+  useEffect(() => {
+    const fetchEquipment = async () => {
+      try {
+        const response = await fetch("/api/equipment", {
+          method: "GET"
+        });
+        const data = await response.json();
+        console.log("equipment data", data);
+        setEquipmentData(data);
+      } catch (error) {
+        console.error("Failed to fetch equipment:", error);
+      }
+    };
+    fetchEquipment();
+  }, []);
   
 
   const handleChangePage = (event, newPage) => {
@@ -68,7 +46,6 @@ export default function Equipment() {
     setExpandedEquipment(null);
   };
 
-  
   return (
     <Container className="equipment-container">
       <Typography variant="h3" className="equipment-title">
@@ -82,7 +59,7 @@ export default function Equipment() {
                 {expandedEquipment && expandedEquipment.id === equipment.id ? (
                   <div className="equipment-expanded">
                     <Paper className="equipment-box" elevation={3}>
-                      <img src={equipment.image} alt={equipment.name} className="equipment-image" />
+                      <img src={equipment.image_path} alt={equipment.name} className="equipment-image" />
                       <Typography variant="h6" className="equipment-name">
                         {equipment.name}
                       </Typography>
@@ -100,7 +77,7 @@ export default function Equipment() {
                     elevation={3}
                     onClick={() => handleExpand(equipment)}
                   >
-                    <img src={equipment.image} alt={equipment.name} className="equipment-image" />
+                    <img src={equipment.image_path} alt={equipment.name} className="equipment-image" />
                     <Typography variant="h6" className="equipment-name">
                       {equipment.name}
                     </Typography>

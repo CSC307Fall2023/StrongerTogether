@@ -33,19 +33,20 @@ export async function POST(request) {
 export async function GET(request) {
   // authenticate the user before returning the informations
   const loggedInData = await checkLoggedIn();
-  if (loggedInData.checkLoggedIn) {
+  if (loggedInData.loggedIn) {
     // find unique user that has the session id
     let user;
     try {
       user = await prisma.User.findUnique({
         where: {
-          id: loggedInData.id
+          id: loggedInData.user.id
         }
       });
     }
     catch (e) {
       return NextResponse.json({ error: "Invalid User Id Provided" }, { status: 500 });
     }
+    console.log(user)
     return NextResponse.json(user);
   }
   return USER_NOT_SIGNED_IN;

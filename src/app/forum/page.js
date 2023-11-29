@@ -8,15 +8,63 @@ import '../globals.css';
 
 const Forum = () => {
 
-  // Function to handle the new post button click
-  const handleNewPostClick = () => {
-    const newPostButton = document.querySelector('.new-post-box');
-    newPostButton.classList.add('clicked');
+  const [showNewPostPopup, setShowNewPostPopup] = useState(false);
 
-    // Remove the 'clicked' class after the animation finishes
-    setTimeout(() => {
-      newPostButton.classList.remove('clicked');
-    }, 1000); // Adjust the duration to match your animation duration
+  const handleNewPostClick = () => {
+    setShowNewPostPopup(true);
+    console.log("clicked");
+  };
+
+  const handleClosePopup = () => {
+    setShowNewPostPopup(false)
+    console.log("closed");
+  };
+
+  const handleLikeClick = async (postId) => {
+    try {
+      // Make a fetch request to your server endpoint
+      const response = await fetch(`/api/like/${postId}`, {
+        method: 'POST',
+        // You may need to include headers and credentials based on your setup
+      });
+
+      if (response.ok) {
+        // If the request is successful, update the local state or re-fetch posts
+        // For simplicity, let's assume your server responds with the updated post data
+        const updatedPost = await response.json();
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === updatedPost.id ? updatedPost : post
+          )
+        );
+      } else {
+        console.error('Failed to update like count');
+      }
+    } catch (error) {
+      console.error('Error updating like count:', error);
+    }
+  };
+
+
+  const tagOptions = [
+    'General',
+    'Discussions',
+    'Sports',
+    'Exercise',
+    'ASI',
+    'Events',
+    // Add more tags as needed
+  ];
+
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  const handleTagChange = (tag) => {
+    // Toggle the selected state of the tag
+    if (selectedTags.includes(tag)) {
+      setSelectedTags((prevSelected) => prevSelected.filter((selectedTag) => selectedTag !== tag));
+    } else {
+      setSelectedTags((prevSelected) => [...prevSelected, tag]);
+    }
   };
 
   const samplePosts = [
@@ -78,16 +126,32 @@ const Forum = () => {
     },
   ];
   
-  
+  const handleNewPostSubmit = () => {
+    // Perform validation
+    
+    // Add the new post to the main database
+
+    // Close the popup
+    handleClosePopup();
+  };
+
+  const handleDraftPost = () => {
+    // Add the new post to the user database
+
+    // Close the popup
+    handleClosePopup();
+  };
+
   const [posts, setPosts] = useState(samplePosts);
   return (
     <div className="forum-container">
+      {showNewPostPopup && <div className="blur-overlay"></div>}
       <div className="forum-title">
         <h1>Forum</h1>
       </div>
       <div className="forum-body">
         <div className='forum-side-boxes'>
-          <button className="new-post-box">
+          <button className="new-post-box" onClick={handleNewPostClick}>
             <h2>New Post</h2>
           </button>
           <div className="filters-box">
@@ -96,7 +160,9 @@ const Forum = () => {
               <li>General</li>
               <li>Discussions</li>
               <li>Sports</li>
-              <li>Activities</li>
+              <li>Exercise</li>
+              <li>ASI</li>
+              <li>Events</li>
             </ul>
           </div>
           <div className="my-options-box">
@@ -120,11 +186,11 @@ const Forum = () => {
                 </div>
               </div>
               <div className="post-actions">
-                <button className="like-button">
+                <button className="like-button"  onClick={() => handleLikeClick(post.id)}>
                   <ThumbUpIcon />
                   <span className="action-count">{post.likes}</span>
                 </button>
-                <button className="dislike-button">
+                <button className="dislike-button"  onClick={() => handleLikeClick(post.id)}>
                   <ThumbDownIcon />
                   <span className="action-count">{post.dislikes}</span>
                 </button>
@@ -139,7 +205,57 @@ const Forum = () => {
             </div>
           ))}
         </div>
+
+
+        {showNewPostPopup && (
+        <div className="new-post-popup">
+          <div className="popup-content">
+            <div className="title-close">
+              <h2 style={{ marginBottom: '20px' }}>New Post</h2>
+              <button className="close-popup" onClick={handleClosePopup}>
+              X
+              </button>
+            </div>
+            <div className="input-field">
+              <label>Title</label>
+              <input type="text" placeholder="Enter title" />
+            </div>
+            <div className="input-field">
+              <label>Description</label>
+              <textarea placeholder="Enter description"></textarea>
+            </div>
+            <div className="input-field">
+                <div className='tag-text'>
+                  <label>Tags</label>
+                  <h5>(Select 1 to 2)</h5>
+                </div>
+                <div className="tag-buttons">
+                  {tagOptions.map((tag, index) => (
+                    <label key={index} className="tag-button">
+                      <input
+                        type="checkbox"
+                        checked={selectedTags.includes(tag)}
+                        onChange={() => handleTagChange(tag)}
+                      />
+                      {tag}
+                    </label>
+                  ))}
+                </div>
+             </div>
+            <div className="button-container">
+              <button className="draft-button" onClick={handleClosePopup}>Save as Draft</button>
+              <button className="submit-button" onClick={handleNewPostSubmit}>Submit</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       </div>
+
+
+      
+
+
     </div>
   );
 };

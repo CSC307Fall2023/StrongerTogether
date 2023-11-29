@@ -272,6 +272,7 @@ body {
   background-color: #f4f4f4; /* Add a background color */
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle box shadow */
   transition: transform 0.2s; /* Add a transform transition for hover effect */
+  overflow: hidden;
 }
 
 .equipment-box:hover {
@@ -280,6 +281,9 @@ body {
 
 .equipment-image {
   width: 100%;
+  height: auto; /* Maintains the aspect ratio of the image */
+  object-fit: cover; /* Ensures the image covers the area without distorting */
+  display: block; /* Removes any extra space around the image */
 }
 
 .equipment-name {
@@ -363,12 +367,21 @@ body {
   border-radius: 10px;
   height: 100%;
   transform: none;
+  max-height: 500px; /* Limit the height of the box */
+  max-width: 80%; /* Limit the width of the box */
+  margin: auto; /* Center the box */
 }
 
 .equipment-expanded .equipment-button {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
+  position: relative; /* Change from absolute to relative */
+  margin-top: 20px; /* Add some space above the button */
+  width: auto; /* Reset width to auto */
+  transform: none; /* Remove transform */
+}
+
+.equipment-expanded .equipment-image {
+  height: 500px; /* Fixed height for consistency */
+  object-fit: contain; /* Ensures the entire image is visible */
 }
 
 
@@ -380,6 +393,7 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  position: relative; /* Ensure relative positioning for the pseudo-element */
 }
 
 .forum-title {
@@ -546,3 +560,123 @@ body {
   font-weight: bold;
 }
 
+.blur-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust the alpha value for darkness */
+  backdrop-filter: blur(5px); /* Adjust the blur amount */
+  z-index: 998; /* Place it below the popup but above the forum content */
+  pointer-events: none; /* Allow interaction with the popup */
+}
+/* Add this to your existing CSS file or create a new one */
+.new-post-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--white); /* Use the background color from your theme */
+  padding: 20px;
+  border: 1px solid var(--border-color); /* Set border color based on your design */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a subtle box shadow */
+  z-index: 999;
+  width: 90vw; /* Adjust the width based on your preference */
+  max-width: 400px; /* Set a maximum width for larger screens */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.popup-content {
+  text-align: left; /* Align text to the left within the popup */
+  width: 100%;
+}
+
+.input-field {
+  margin-bottom: 20px;
+}
+
+.input-field label {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+textarea {
+  width: calc(100% - 20px); /* Adjust width with padding consideration */
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid var(--border-color); /* Match border color to your design */
+  border-radius: 5px;
+  margin-top: 5px; /* Add margin to separate the input fields */
+}
+
+/* Add a small border around the input fields */
+.input-field input[type="text"],
+.input-field textarea {
+  border: 1px solid var(--black);
+  padding: 8px; /* Adjust padding for a cleaner look */
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between; /* Add space between the buttons */
+}
+
+.draft-button,
+.submit-button {
+  background-color: var(--green); /* Use the green color from your theme */
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.draft-button:hover,
+.submit-button:hover {
+  background-color: var(--hover-green); /* Darken the background color on hover */
+  transform: scale(1.02); /* Slightly scale up the button on hover */
+}
+
+.new-post-box {
+  width: 100%;
+  box-shadow: 0 8px 12px rgba(0.4, 0.4, 0.4, 0.4); /* Adjust shadow properties as needed */
+  transition: transform 0.2s; /* Add a transition for smooth scaling */
+}
+
+.new-post-box:hover {
+  transform: scale(1.04); /* Scale up by 5% on hover */
+  background-color: var(--hover-green);
+}
+
+.title-close {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.close-popup {
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  font-size: 30px; /* Increase font size for the close button */
+  color: black;
+  transition: transform 0.1s; /* Add a transition for smooth scaling */
+}
+
+.close-popup:hover {
+  transform: scale(1.04); /* Scale up by 5% on hover */
+  background-color: rgb(204, 204, 204);
+}
+
+.tag-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}

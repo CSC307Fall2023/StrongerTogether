@@ -16,18 +16,39 @@ export async function POST(request) {
       startTime: startTime,
       endTime: endTime,
       maxAttendee: maxAttendee,
-      hostId: 1, // change this to something more dynamic
-      EventFilter: {
-        // add filters to the events and connect them to existing possible filters
-        create: filterIds.map((id) => ({
+      hostId: 1, // Change this to something more dynamic
+    };
+    
+    // Check if filterIds array is not empty
+    if (filterIds && filterIds.length > 0) {
+      eventData.EventFilter = {
+        create: filterIds.map(id => ({
           possibleFilter: {
             connect: {
               id: id,
             },
           },
         })),
-      },
-    };
+      };
+    }
+    // const eventData = {
+    //   eventName: eventName,
+    //   location: location,
+    //   startTime: startTime,
+    //   endTime: endTime,
+    //   maxAttendee: maxAttendee,
+    //   hostId: 1, // change this to something more dynamic
+    //   EventFilter: {
+    //     // add filters to the events and connect them to existing possible filters
+    //     create: filterIds.map((id) => ({
+    //       possibleFilter: {
+    //         connect: {
+    //           id: id,
+    //         },
+    //       },
+    //     })),
+    //   },
+    // };
     console.log(eventData);
     let events;
     try {

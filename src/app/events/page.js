@@ -27,6 +27,7 @@ const Events = () => {
         attendees: 0,
         interestedCount: 0,
         goingCount: 0,
+        eventId: 0,
         creatorId: '123' // replace this with actual userID in future
     });
 
@@ -115,12 +116,13 @@ const Events = () => {
             attendees: 0,
             interestedCount: 0,
             goingCount: 0,
+            eventId: 0,
             creatorId: '123' // Reset to the default user ID after adding the event
         });
         setOpen(false);
     };
 
-    const handleRemoveEvent = (index) => {
+    const handleRemoveEvent = async(index) => {
         const eventToRemove = events[index];
         if (eventToRemove.creatorId === userId) {
             const updatedEvents = events.filter((event, i) => i !== index);
@@ -129,18 +131,18 @@ const Events = () => {
             console.log("You are not authorized to delete this event.");
         }
 
-        // const response = await fetch("/api/events", {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({
-        //         eventName: newEvent.title,
-        //         location: newEvent.location,
-        //         startTime: newEvent.startTime,
-        //         endTime: newEvent.endTime,
-        //         maxAttendee: newEvent.attendees,
-        //         filterIds: newEvent
-        //     }),
-        //   });
+        console.log(eventToRemove);
+
+        const response = await fetch("/api/events", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: eventToRemove.id
+            }),
+          });
+        if (response.ok) {
+            console.log("event deleted")
+        }
     };
 
     const handleEditEvent = async(index) => {

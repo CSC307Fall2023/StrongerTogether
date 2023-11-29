@@ -81,15 +81,17 @@ const Events = () => {
             setErrorMessage('Missing required fields'); // Show an alert if any required field is empty
             return; // Don't proceed further
         }
-
+        console.log(newEvent.startTime);
+        let formattedStartTime = newEvent.date + "T" + newEvent.startTime + ":00" + 'Z';
+        let formattedEndTime = newEvent.date + "T" + newEvent.endTime + ":00" + 'Z';
         const response = await fetch("/api/events", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 eventName: newEvent.title,
                 location: newEvent.location,
-                startTime: newEvent.startTime,
-                endTime: newEvent.endTime,
+                startTime: formattedStartTime,
+                endTime: formattedEndTime,
                 maxAttendee: newEvent.attendees,
                 filterIds: [1]
             }),

@@ -128,7 +128,7 @@ model Event {
   startTime     DateTime
   endTime       DateTime
   maxAttendee   Int
-  hostId        Int             @unique
+  hostId        Int            
   host          User            @relation(fields: [hostId], references: [id], onDelete: Cascade)
   EventFilter   EventFilter[]
   // EventAttendee User[]          @relation("Attendee") // many to many implicit relationship

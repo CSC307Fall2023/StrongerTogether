@@ -1,6 +1,6 @@
 'use client'
-
-import React, { useState } from 'react';
+import { useSession, getSession} from 'next-auth/react';
+import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -15,11 +15,12 @@ import { Card, CardContent, Container, Paper, Typography } from "@mui/material";
 import '../globals.css';
 
 const Events = () => {
+    const { data: session, status }  = useSession();
+    let userId = session?.user?.id;
     const [events, setEvents] = useState([]);
     const [open, setOpen] = useState(false);
     const [newEvent, setNewEvent] = useState({
         title: '',
-        creator: '',
         date: '',
         startTime: '',
         endTime: '',
@@ -28,13 +29,10 @@ const Events = () => {
         interestedCount: 0,
         goingCount: 0,
         eventId: 0,
-        creatorId: '123' // replace this with actual userID in future
+        hostId: -1 // replace this with actual userID in future
     });
 
     const [errorMessage, setErrorMessage] = useState(""); //error message
-
-    const userId = '123'; // simulated current userID
-
     const [editIndex, setEditIndex] = useState(null);
 
     // track user interactions
@@ -43,7 +41,6 @@ const Events = () => {
 
     const [editEvent, setEditEvent] = useState({
         title: '',
-        creator: '',
         date: '',
         startTime: '',
         endTime: '',
@@ -51,8 +48,24 @@ const Events = () => {
         attendees: 0,
         interestedCount: 0,
         goingCount: 0,
-        creatorId: ''
+        hostId: -1
     });
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+          try {
+            const response = await fetch("/api/events", {
+              method: "GET"
+            });
+            const data = await response.json();
+            setEvents(data);
+          } catch (error) {
+            console.error("Failed to fetch events", error);
+          }
+        };
+        fetchEvents();
+      }, []);
+
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -71,7 +84,6 @@ const Events = () => {
     const handleAddEvent = async() => {
         if (
             !newEvent.title ||
-            !newEvent.creator ||
             !newEvent.date ||
             !newEvent.startTime ||
             !newEvent.endTime ||
@@ -93,24 +105,32 @@ const Events = () => {
                 startTime: formattedStartTime,
                 endTime: formattedEndTime,
                 maxAttendee: newEvent.attendees,
-                filterIds: [1]
             }),
           });
 
+        if (response.ok) {
+            response.json().then((responseData) => {
+                const { id } = responseData;
+                newEvent.hostId = userId;
+                setNewEvent((event) => ({...event, eventId: id, hostId: userId}))
+                const updatedEvents = [...events, newEvent];
+                setEvents(updatedEvents);
+            })
+        }
+
         console.log(response)
 
-        if (editIndex !== null) {
-            const updatedEvents = [...events];
-            updatedEvents[editIndex] = newEvent;
-            setEvents(updatedEvents);
-            setEditIndex(null);
-        } else {
-            const updatedEvents = [...events, newEvent];
-            setEvents(updatedEvents);
-        }
+        // if (editIndex !== null) {
+        //     const updatedEvents = [...events];
+        //     updatedEvents[editIndex] = newEvent;
+        //     setEvents(updatedEvents);
+        //     setEditIndex(null);
+        // } else {
+        //     const updatedEvents = [...events, newEvent];
+        //     setEvents(updatedEvents);
+        // }
         setNewEvent({
             title: '',
-            creator: '',
             date: '',
             startTime: '',
             endTime: '',
@@ -119,14 +139,14 @@ const Events = () => {
             interestedCount: 0,
             goingCount: 0,
             eventId: 0,
-            creatorId: '123' // Reset to the default user ID after adding the event
+            hostId: userId // Reset to the default user ID after adding the event
         });
         setOpen(false);
     };
 
     const handleRemoveEvent = async(index) => {
         const eventToRemove = events[index];
-        if (eventToRemove.creatorId === userId) {
+        if (eventToRemove.hostId === userId) {
             const updatedEvents = events.filter((event, i) => i !== index);
             setEvents(updatedEvents);
         } else {
@@ -139,7 +159,7 @@ const Events = () => {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                id: eventToRemove.id
+                id: eventToRemove.eventId
             }),
           });
         if (response.ok) {
@@ -149,7 +169,7 @@ const Events = () => {
 
     const handleEditEvent = async(index) => {
         const eventToEdit = events[index];
-        if (eventToEdit.creatorId === userId) {
+        if (eventToEdit.hostId === userId) {
             setEditIndex(index);
             setNewEvent(eventToEdit);
             setOpen(true);
@@ -238,9 +258,6 @@ const Events = () => {
                                                     Location: {event.location}
                                                 </Typography>
                                                 <Typography variant="body2" className="events-description">
-                                                    Creator: {event.creator}
-                                                </Typography>
-                                                <Typography variant="body2" className="events-description">
                                                     Maximum Participants: {event.attendees}
                                                 </Typography>
                                                 <div>
@@ -250,7 +267,7 @@ const Events = () => {
                                                     <Button className="events-info-button" startIcon={<EventIcon />} onClick={() => handleGoing(index)}>
                                                         Going ({event.goingCount})
                                                     </Button>
-                                                    {event.creatorId === userId && (
+                                                    {event.hostId === userId && (
                                                         <>
                                                             <Button className="events-info-button" onClick={() => handleRemoveEvent(index)}>
                                                                 Delete
@@ -320,14 +337,6 @@ const Events = () => {
                                     label="Location"
                                     name="location"
                                     value={newEvent.location}
-                                    onChange={handleInputChange}
-                                    fullWidth
-                                />
-                                <TextField
-                                    margin="normal"
-                                    label="Creator"
-                                    name="creator"
-                                    value={newEvent.creator}
                                     onChange={handleInputChange}
                                     fullWidth
                                 />

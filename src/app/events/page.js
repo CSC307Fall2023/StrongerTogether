@@ -39,7 +39,8 @@ const Events = () => {
     EventFilter: [],
     eventAttendee: []
   });
-
+  
+  const [errorMessage, setErrorMessage] = useState(""); //error message
   const [editIndex, setEditIndex] = useState(null);
 
   // track user interactions
@@ -224,7 +225,7 @@ const Events = () => {
     setNewEvent({ ...newEvent, [name]: value });
   };
 
-  const handleAddEvent = () => {
+  const handleAddEvent = async() => {
     if (
       !newEvent.title ||
       !newEvent.date ||
@@ -233,13 +234,34 @@ const Events = () => {
       !newEvent.location ||
       !newEvent.maxAttendee
     ) {
-      alert("Missing required fields"); // Show an alert if any required field is empty
+      setErrorMessage('Missing required fields'); // Show an alert if any required field is empty
       return; // Don't proceed further
     }
 
     if (editIndex !== null) {
       const updatedEvents = [...events];
       updatedEvents[editIndex] = newEvent;
+
+      // Combine date and time
+      const startTime = new Date(newEvent.date + "T" + newEvent.startTime);
+      const endTime = new Date(newEvent.date + "T" + newEvent.endTime);
+      const ISOStartTime = startTime.toISOString();
+      const ISOEndTime = endTime.toISOString();
+
+      const response = await fetch("/api/events", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: newEvent.id,
+          eventName: newEvent.title,
+          location: newEvent.location,
+          startTime: ISOStartTime,
+          endTime: ISOEndTime,
+          maxAttendee: newEvent.maxAttendee,
+          filterIds: [6]
+        }),
+      });
+
       setEvents(updatedEvents);
       setEditIndex(null);
     } else {
@@ -515,7 +537,11 @@ const Events = () => {
                   onChange={handleInputChange}
                   fullWidth
                 />
-                {/* Rest of form fields if need more */}
+                {errorMessage && (
+                  <Typography color="error">
+                    {errorMessage}
+                  </Typography>
+                )}
               </DialogContent>
               <DialogActions>
                 <Button

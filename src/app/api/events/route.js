@@ -189,7 +189,7 @@ export async function PATCH(request) {
       location: location,
       startTime: startTime,
       endTime: endTime,
-      maxAttendee: maxAttendee,
+      maxAttendee: parseInt(maxAttendee),
       hostId: 1, // change this to something more dynamic
       EventFilter: {
         // add filters to the events and connect them to existing possible filters

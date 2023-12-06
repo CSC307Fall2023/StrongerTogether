@@ -152,33 +152,6 @@ const Events = () => {
             interestedCount: 0,
             goingCount: 0,
             EventFilter,
-
-            host: { name },
-          } = addedEvent;
-          console.log("addedEvent", addEventData)
-          setEvents((events) =>
-            [...events, {
-                id,
-                maxAttendee,
-                hostId,
-                title: eventName,
-                creator: name,
-                date: formatISO8601ToDateOnly(startTime),
-                startTime: formatISO8601ToTimeOnly(startTime),
-                endTime: formatISO8601ToTimeOnly(endTime),
-                location: location,
-                interestedCount: 0,
-                goingCount: 0,
-                EventFilter,
-                EventAttendee: []
-
-            }]
-          );
-        } else {
-          console.error('Failed to add new post');
-        }
-      } catch (error) {
-        console.error('Error adding new Post:', error);
             eventAttendee: [],
           },
         ]);

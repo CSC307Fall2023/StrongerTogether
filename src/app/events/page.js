@@ -152,7 +152,7 @@ const Events = () => {
                 interestedCount: 0,
                 goingCount: 0,
                 EventFilter,
-                EventAttendee
+                EventAttendee: []
 
             }]
           );

@@ -17,8 +17,11 @@ import {
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+//import { useRouter } from "next/router";
 
 export default function Profile() {
+  //const router = useRouter();
+  //const { userId } = router.query;
   const [isEditing, setIsEditing] = useState(false);
   const [isPrivate, setPrivate] = useState(false);
   const [name, setName] = useState("");
@@ -48,6 +51,51 @@ export default function Profile() {
       2
     )
   );
+
+  function formatISO8601ToDateOnly(isoString) {
+    const date = new Date(isoString);
+
+    // Getting components of the date
+    const months = [
+      "Jan.",
+      "Feb.",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "Aug.",
+      "Sept.",
+      "Oct.",
+      "Nov.",
+      "Dec.",
+    ];
+    const month = months[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    // Combine the date components
+    return `${month} ${day}, ${year}`;
+  }
+
+  function formatISO8601ToTimeOnly(isoString) {
+    const date = new Date(isoString);
+
+    // Formatting the time in 12-hour format with AM/PM
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "pm" : "am";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+
+    // Combine the time components
+    return `${hours}:${minutes}${ampm}`;
+  }
+
+  function userPopulate(userId) {
+
+  }
+
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -134,27 +182,27 @@ export default function Profile() {
       let base64photo;
       // takes the image and turns it into a blob and sends it to the backend to put into cloud
       fetch(photo)
-      .then(response => response.blob())
-      .then(blob => {
-        const reader = new FileReader();
-        reader.readAsDataURL(blob); 
-        reader.onloadend = async function() {
-          base64photo = reader.result;
-          const response = await fetch("/api/users", {
-            method: "PUT",
-            body: JSON.stringify({
-              name,
-              shortBio: bio,
-              status: isPrivate ? "PRIVATE" : "PUBLIC",
-              ProfileImage: base64photo,
-              gymFrequency: experience,
-            }),
-          });
-          if (response.ok) {
-            console.log("Success", response);
+        .then(response => response.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onloadend = async function () {
+            base64photo = reader.result;
+            const response = await fetch("/api/users", {
+              method: "PUT",
+              body: JSON.stringify({
+                name,
+                shortBio: bio,
+                status: isPrivate ? "PRIVATE" : "PUBLIC",
+                ProfileImage: base64photo,
+                gymFrequency: experience,
+              }),
+            });
+            if (response.ok) {
+              console.log("Success", response);
+            }
           }
-        }
-      });
+        });
     } catch (error) {
       console.error("Error updating profile:", error);
     }
@@ -285,6 +333,7 @@ export default function Profile() {
                 <FormControl variant="filled">
                   <InputLabel
                     variant="standard"
+                    defaultValue={"experience"}
                     htmlFor="uncontrolled-native"
                   ></InputLabel>
                   <div className="select-wrapper">
@@ -322,9 +371,16 @@ export default function Profile() {
                   <div className="interested-in">
                     <center>
                       <b>
-                        <p>Interested in</p>
+                        <p>Friends With</p>
                       </b>
                     </center>
+                    <div className="eventContent">
+                      {friends.map((friend, index) => (
+                        <div className="friend">
+                          <Button>{friend}</Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -333,14 +389,18 @@ export default function Profile() {
                   <div className="upcoming-event">
                     <center>
                       <b>
-                        <p>Upcoming Events</p>
+                        <p>Upcoming Hosted Events</p>
                       </b>
                     </center>
                     <div className="eventContent">
-                      {/* <div className="title">Basketball</div>
-                    <div className="body">Location: Rec-Center courts</div>
-                    <div className="body">Date: 11/9/2023</div>
-                    <div className="body">Time: 3pm </div> */}
+                      {HostEvents.map((event, index) => (
+                        <>
+                          <div className="title">{event.eventName}</div>
+                          <div className="body">Location: {event.location}</div>
+                          <div className="body">Date: {formatISO8601ToDateOnly(event.startTime)}</div>
+                          <div className="body">Time: {formatISO8601ToTimeOnly(event.startTime)}-{formatISO8601ToTimeOnly(event.endTime)} </div>
+                        </>
+                      ))}
                     </div>
                   </div>
                 </CardContent>
@@ -352,6 +412,15 @@ export default function Profile() {
                       <b>
                         <p>Forum Activity</p>
                       </b>
+                      <div className="eventContent">
+                        {postCreated.map((post, index) => (
+                          <>
+                            <div className="title"> {post.postTitle}</div>
+                            <div className="body"> {formatISO8601ToDateOnly(post.createdAt)} @{formatISO8601ToTimeOnly(post.createdAt)}</div>
+                          </>
+                        ))}
+                      </div>
+
                     </center>
                   </div>
                 </CardContent>

@@ -129,9 +129,12 @@ input[type="file"] {
 
 .eventContent .title {
     font-weight: bold; 
+    text-align: left;
+    font-size: medium;
 }
 
 .eventContent .body {
-    color: #5b5959
+    color: #5b5959;
+    text-align: left;
+    font-size: small
 }
-

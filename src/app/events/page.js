@@ -258,13 +258,26 @@ const Events = () => {
     setOpen(false);
   };
   
-  const handleRemoveEvent = (index) => {
+  const handleRemoveEvent = async(index) => {
     const eventToRemove = events[index];
     if (eventToRemove.hostId === userId) {
       const updatedEvents = events.filter((event, i) => i !== index);
       setEvents(updatedEvents);
     } else {
       console.log("You are not authorized to delete this event.");
+    }
+
+    console.log(eventToRemove);
+
+    const response = await fetch("/api/events", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+          id: eventToRemove.id
+      }),
+    });
+    if (response.ok) {
+        console.log("event deleted")
     }
   };
 

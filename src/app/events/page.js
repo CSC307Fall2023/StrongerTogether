@@ -207,7 +207,7 @@ const Events = () => {
       }
     };
     fetchEvents();
-  }, []);
+  }, [userInteractions]);
 
   const handleClickOpen = () => {
     setOpen(true);

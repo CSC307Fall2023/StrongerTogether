@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession, getSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -12,13 +13,16 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import { Card, CardContent, Container, Paper, Typography } from "@mui/material";
-import ListItemButton from '@mui/material/ListItemButton';
-import Collapse from '@mui/material/Collapse';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import ListItemButton from "@mui/material/ListItemButton";
+import Collapse from "@mui/material/Collapse";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+
 import "../globals.css";
 
 const Events = () => {
+  const { data: session, status } = useSession();
+  let userId = session?.user?.id; // current userID
   const [events, setEvents] = useState([]);
   const [open, setOpen] = useState(false);
   const [newEvent, setNewEvent] = useState({
@@ -32,13 +36,10 @@ const Events = () => {
     location: "",
     interestedCount: 0,
     goingCount: 0,
-    creatorId: "123", // replace this with actual userID in future
     maxAttendee: 0,
     EventFilter: [],
-    eventAttendee: []
+    eventAttendee: [],
   });
-
-  const userId = "123"; // simulated current userID
 
   const [editIndex, setEditIndex] = useState(null);
 
@@ -86,7 +87,6 @@ const Events = () => {
   }
 
   const addEventData = async () => {
-
     // const [newEvent, setNewEvent] = useState({
     //     id: 0,
     //     hostId: 0,
@@ -98,43 +98,61 @@ const Events = () => {
     //     location: "",
     //     interestedCount: 0,
     //     goingCount: 0,
-    //     creatorId: "123", // replace this with actual userID in future
     //     maxAttendee: 0,
     //     EventFilter: [],
     //   });
     try {
-        // Combine date and time
-        const startTime = new Date(newEvent.date + "T" + newEvent.startTime);
-        const endTime = new Date(newEvent.date + "T" + newEvent.endTime);
-        const ISOStartTime = startTime.toISOString();
-        const ISOEndTime = endTime.toISOString();
-        const eventData = {
-            eventName: newEvent.title,
-            location: newEvent.location,
-            startTime: ISOStartTime,
-            endTime: ISOEndTime,
-            maxAttendee: newEvent.maxAttendee,
-          }
-        
-        // Make a fetch request to your server endpoint
-        const response = await fetch("/api/events", {
-          method: 'POST',
-          body: JSON.stringify({
-            ...eventData
-          }),
-        });
-  
-        if (response.ok) {
-          const addedEvent = await response.json();
-          const {
+      // Combine date and time
+      const startTime = new Date(newEvent.date + "T" + newEvent.startTime);
+      const endTime = new Date(newEvent.date + "T" + newEvent.endTime);
+      const ISOStartTime = startTime.toISOString();
+      const ISOEndTime = endTime.toISOString();
+      const eventData = {
+        eventName: newEvent.title,
+        location: newEvent.location,
+        startTime: ISOStartTime,
+        endTime: ISOEndTime,
+        maxAttendee: newEvent.maxAttendee,
+      };
+
+      // Make a fetch request to your server endpoint
+      const response = await fetch("/api/events", {
+        method: "POST",
+        body: JSON.stringify({
+          ...eventData,
+        }),
+      });
+
+      if (response.ok) {
+        const addedEvent = await response.json();
+        const {
+          id,
+          hostId,
+          eventName,
+          location,
+          startTime,
+          endTime,
+          maxAttendee,
+          EventFilter,
+          host: { name },
+        } = addedEvent;
+        console.log("addedEvent", JSON.stringify(addedEvent));
+        setEvents((events) => [
+          ...events,
+          {
             id,
-            hostId,
-            eventName,
-            location,
-            startTime,
-            endTime,
             maxAttendee,
+            hostId,
+            title: eventName,
+            creator: name,
+            date: formatISO8601ToDateOnly(startTime),
+            startTime: formatISO8601ToTimeOnly(startTime),
+            endTime: formatISO8601ToTimeOnly(endTime),
+            location: location,
+            interestedCount: 0,
+            goingCount: 0,
             EventFilter,
+
             host: { name },
           } = addedEvent;
           console.log("addedEvent", addEventData)
@@ -161,8 +179,16 @@ const Events = () => {
         }
       } catch (error) {
         console.error('Error adding new Post:', error);
+            eventAttendee: [],
+          },
+        ]);
+      } else {
+        console.error("Failed to add new post");
       }
-  }
+    } catch (error) {
+      console.error("Error adding new Post:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -183,9 +209,11 @@ const Events = () => {
             maxAttendee,
             EventFilter,
             host: { name },
-            EventAttendee
+            EventAttendee,
           } = event;
-          const eventAttendee = EventAttendee.map((attendee) => attendee.user.name);
+          const eventAttendee = EventAttendee.map(
+            (attendee) => attendee.user.name
+          );
           console.log("eventAttendee", eventAttendee);
           return {
             id,
@@ -200,7 +228,7 @@ const Events = () => {
             interestedCount: eventAttendee.length,
             goingCount: 0,
             EventFilter,
-            eventAttendee
+            eventAttendee,
           };
         });
         setEvents(manyEvents);
@@ -209,7 +237,7 @@ const Events = () => {
       }
     };
     fetchEvents();
-  }, []);
+  }, [userInteractions]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -228,11 +256,11 @@ const Events = () => {
   const handleAddEvent = () => {
     if (
       !newEvent.title ||
-      !newEvent.creator ||
       !newEvent.date ||
       !newEvent.startTime ||
       !newEvent.endTime ||
-      !newEvent.location
+      !newEvent.location ||
+      !newEvent.maxAttendee
     ) {
       alert("Missing required fields"); // Show an alert if any required field is empty
       return; // Don't proceed further
@@ -255,24 +283,39 @@ const Events = () => {
       location: "",
       interestedCount: 0,
       goingCount: 0,
-      creatorId: "123", // Reset to the default user ID after adding the event
     });
     setOpen(false);
   };
-  
-  const handleRemoveEvent = (index) => {
+
+  const handleRemoveEvent = async (index) => {
     const eventToRemove = events[index];
-    if (eventToRemove.creatorId === userId) {
+    if (eventToRemove.hostId === userId) {
       const updatedEvents = events.filter((event, i) => i !== index);
       setEvents(updatedEvents);
     } else {
       console.log("You are not authorized to delete this event.");
     }
+
+    console.log(eventToRemove);
+    try {
+      const response = await fetch("/api/events", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: eventToRemove.id,
+        }),
+      });
+      if (response.ok) {
+        console.log("event deleted");
+      }
+    } catch (error) {
+      console.error("Failed to delete event:", error);
+    }
   };
 
   const handleEditEvent = (index) => {
     const eventToEdit = events[index];
-    if (eventToEdit.creatorId === userId) {
+    if (eventToEdit.hostId === userId) {
       setEditIndex(index);
       setNewEvent(eventToEdit);
       setOpen(true);
@@ -285,7 +328,7 @@ const Events = () => {
   const handleInterested = async (index) => {
     const updatedEvents = [...events];
     const userInteracted = userInteractions[index]?.interested || false;
-    const eventId = updatedEvents[index]['id']
+    const eventId = updatedEvents[index]["id"];
     if (!userInteracted) {
       setUserInteractions({
         ...userInteractions,
@@ -300,22 +343,23 @@ const Events = () => {
     try {
       // Make a fetch request to your server endpoint
       const response = await fetch("/api/eventAttendee", {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify({
-          eventId
+          eventId,
         }),
       });
 
       if (response.ok) {
         const updatedEvent = await response.json();
-        if (updatedEvent.type === "create") updatedEvents[index].interestedCount++;
+        if (updatedEvent.type === "create")
+          updatedEvents[index].interestedCount++;
         else updatedEvents[index].interestedCount--;
         setEvents(updatedEvents);
       } else {
-        console.error('Failed to update like count');
+        console.error("Failed to update like count");
       }
     } catch (error) {
-      console.error('Error updating like count:', error);
+      console.error("Error updating like count:", error);
     }
   };
 
@@ -351,13 +395,13 @@ const Events = () => {
             alignItems: "stretch",
           }}
         >
-          <div> 
+          <div>
             <List>
               {events.map((event, index) => (
                 <ListItem key={index}>
                   <Card>
                     <CardContent>
-                      <div style={{ margin: "10px 20px", width: 500}}>
+                      <div style={{ margin: "10px 20px", width: 500 }}>
                         <Typography variant="h6" className="events-name">
                           {event.title}
                         </Typography>
@@ -383,12 +427,6 @@ const Events = () => {
                           variant="body2"
                           className="events-description"
                         >
-                          Creator: {event.creator}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          className="events-description"
-                        >
                           Max Attendees: {event.maxAttendee}
                         </Typography>
                         <div>
@@ -396,26 +434,43 @@ const Events = () => {
                             className="events-info-button"
                             startIcon={<ThumbUpIcon />}
                             onClick={() => handleInterested(index)}
+                            sx={{margin: "20px auto", width: "225px", height: "50px"}}
                           >
                             Interested ({event.interestedCount})
                           </Button>
                           <ListItemButton onClick={() => handleGoing(index)}>
                             <ListItemText primary="Who's Going?" />
-                            {userInteractions[index]?.going ? <ExpandLess /> : <ExpandMore />}
+                            {userInteractions[index]?.going ? (
+                              <ExpandLess />
+                            ) : (
+                              <ExpandMore />
+                            )}
                           </ListItemButton>
-                          <Collapse in={userInteractions[index]?.going} timeout="auto" unmountOnExit>
-                          <List component="div" disablePadding>
-                            <ListItemButton sx={{ pl: 4 }}>
-                              {events[index]['eventAttendee'].length > 0 ? (
-                                events[index]['eventAttendee'].map((attendeeName, attendeeIndex) => (
-                                  <ListItemText key={attendeeIndex} primary={attendeeName} />
-                                ))
+                          <Collapse
+                            in={userInteractions[index]?.going}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <List component="div" disablePadding>
+                              {events[index]["eventAttendee"].length > 0 ? (
+                                events[index]["eventAttendee"].map(
+                                  (attendeeName, attendeeIndex) => (
+                                    <ListItemText
+                                      sx={{ margin: "10px auto 20px 40px" }}
+                                      key={attendeeIndex}
+                                      primary={attendeeName}
+                                    />
+                                  )
+                                )
                               ) : (
-                                <ListItemText key={index} primary="No One :(" />
+                                <ListItemText
+                                  key={index}
+                                  primary="No One :("
+                                  sx={{ margin: "10px auto 20px 40px" }}
+                                />
                               )}
-                            </ListItemButton>
-                          </List>
-                        </Collapse>
+                            </List>
+                          </Collapse>
                           {/* <Button
                             className="events-info-button"
                             startIcon={<EventIcon />}
@@ -423,21 +478,23 @@ const Events = () => {
                           >
                             Going ({event.goingCount})
                           </Button> */}
-                          {event.creatorId === userId && (
-                            <>
-                              <Button
+                          {event.hostId === userId && (
+                            <div style={{display: "flex", justifyContent: "space-evenly", marginTop: "20px"}}>
+                            <Button
                                 className="events-info-button"
                                 onClick={() => handleRemoveEvent(index)}
+                                sx={{width: "225px"}}
                               >
                                 Delete
                               </Button>
                               <Button
                                 className="events-info-button"
                                 onClick={() => handleEditEvent(index)}
+                                sx={{width: "225px"}}
                               >
                                 Edit
                               </Button>
-                            </>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -504,9 +561,9 @@ const Events = () => {
                 />
                 <TextField
                   margin="normal"
-                  label="Creator"
-                  name="creator"
-                  value={newEvent.creator}
+                  label="Max Attendees"
+                  name="maxAttendee"
+                  value={newEvent.maxAttendee}
                   onChange={handleInputChange}
                   fullWidth
                 />

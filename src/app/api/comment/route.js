@@ -15,7 +15,6 @@ export async function POST(request) {
     let commented;
     const newCommentData = {
       comment,
-      postId,
       post: { connect: { id: postId } },
       user: { connect: { id: userId } },
     };

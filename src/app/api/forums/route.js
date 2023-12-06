@@ -52,7 +52,7 @@ export async function GET(request) {
   // send in GET request as query in URL
   const loggedInData = await checkLoggedIn();
   // Optimize this with SQL later :))
-  if (loggedInData.loggedIn) {
+  if (true || loggedInData.loggedIn) {
     let forums;
     try {
       forums = await prisma.$queryRaw`

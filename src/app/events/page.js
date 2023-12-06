@@ -134,9 +134,9 @@ const Events = () => {
             endTime,
             maxAttendee,
             EventFilter,
-            host: { name },
+            host: { name }
           } = addedEvent;
-          console.log("addedEvent", addEventData)
+          console.log("addedEvent", JSON.stringify(addedEvent))
           setEvents((events) =>
             [...events, {
                 id,
@@ -152,7 +152,6 @@ const Events = () => {
                 goingCount: 0,
                 EventFilter,
                 eventAttendee: []
-
             }]
           );
         } else {
@@ -208,7 +207,7 @@ const Events = () => {
       }
     };
     fetchEvents();
-  }, []);
+  }, [userInteractions]);
 
   const handleClickOpen = () => {
     setOpen(true);

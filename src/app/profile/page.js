@@ -32,22 +32,22 @@ export default function Profile() {
   const [friends, setFriends] = useState([]);
   // TODO: add useState for interested in, upcoming events, forum activities
   const { data: session, status } = useSession();
-  // console.log(
-  //   JSON.stringify(
-  //     {
-  //       name,
-  //       bio,
-  //       photo,
-  //       experience,
-  //       HostEvents,
-  //       postCreated,
-  //       friendPending,
-  //       friends,
-  //     },
-  //     null,
-  //     2
-  //   )
-  // );
+  console.log(
+    JSON.stringify(
+      {
+        name,
+        bio,
+        photo,
+        experience,
+        HostEvents,
+        postCreated,
+        friendPending,
+        friends,
+      },
+      null,
+      2
+    )
+  );
 
   useEffect(() => {
     const fetchProfile = async () => {

@@ -50,7 +50,7 @@ export async function POST(request) {
       return NextResponse.json({ error: e.message }, { status: 500 });
     }
     // simple console.log logger (need to add an actual logger in the future)
-    console.log(events);
+    console.log("LOGGED EVENTS", events);
     return NextResponse.json(events);
   }
   return USER_NOT_SIGNED_IN;

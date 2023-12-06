@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession, getSession} from 'next-auth/react';
 import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -19,6 +20,8 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import "../globals.css";
 
 const Events = () => {
+  const { data: session, status }  = useSession();
+  let userId = session?.user?.id; // current userID
   const [events, setEvents] = useState([]);
   const [open, setOpen] = useState(false);
   const [newEvent, setNewEvent] = useState({
@@ -32,13 +35,10 @@ const Events = () => {
     location: "",
     interestedCount: 0,
     goingCount: 0,
-    creatorId: "123", // replace this with actual userID in future
     maxAttendee: 0,
     EventFilter: [],
     eventAttendee: []
   });
-
-  const userId = "123"; // simulated current userID
 
   const [editIndex, setEditIndex] = useState(null);
 
@@ -98,7 +98,6 @@ const Events = () => {
     //     location: "",
     //     interestedCount: 0,
     //     goingCount: 0,
-    //     creatorId: "123", // replace this with actual userID in future
     //     maxAttendee: 0,
     //     EventFilter: [],
     //   });
@@ -152,7 +151,7 @@ const Events = () => {
                 interestedCount: 0,
                 goingCount: 0,
                 EventFilter,
-                EventAttendee
+                eventAttendee: []
 
             }]
           );
@@ -228,11 +227,11 @@ const Events = () => {
   const handleAddEvent = () => {
     if (
       !newEvent.title ||
-      !newEvent.creator ||
       !newEvent.date ||
       !newEvent.startTime ||
       !newEvent.endTime ||
-      !newEvent.location
+      !newEvent.location ||
+      !newEvent.maxAttendee
     ) {
       alert("Missing required fields"); // Show an alert if any required field is empty
       return; // Don't proceed further
@@ -255,24 +254,36 @@ const Events = () => {
       location: "",
       interestedCount: 0,
       goingCount: 0,
-      creatorId: "123", // Reset to the default user ID after adding the event
     });
     setOpen(false);
   };
   
-  const handleRemoveEvent = (index) => {
+  const handleRemoveEvent = async(index) => {
     const eventToRemove = events[index];
-    if (eventToRemove.creatorId === userId) {
+    if (eventToRemove.hostId === userId) {
       const updatedEvents = events.filter((event, i) => i !== index);
       setEvents(updatedEvents);
     } else {
       console.log("You are not authorized to delete this event.");
     }
+
+    console.log(eventToRemove);
+
+    const response = await fetch("/api/events", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+          id: eventToRemove.id
+      }),
+    });
+    if (response.ok) {
+        console.log("event deleted")
+    }
   };
 
   const handleEditEvent = (index) => {
     const eventToEdit = events[index];
-    if (eventToEdit.creatorId === userId) {
+    if (eventToEdit.hostId === userId) {
       setEditIndex(index);
       setNewEvent(eventToEdit);
       setOpen(true);
@@ -383,12 +394,6 @@ const Events = () => {
                           variant="body2"
                           className="events-description"
                         >
-                          Creator: {event.creator}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          className="events-description"
-                        >
                           Max Attendees: {event.maxAttendee}
                         </Typography>
                         <div>
@@ -423,7 +428,7 @@ const Events = () => {
                           >
                             Going ({event.goingCount})
                           </Button> */}
-                          {event.creatorId === userId && (
+                          {event.hostId === userId && (
                             <>
                               <Button
                                 className="events-info-button"
@@ -504,9 +509,9 @@ const Events = () => {
                 />
                 <TextField
                   margin="normal"
-                  label="Creator"
-                  name="creator"
-                  value={newEvent.creator}
+                  label="Max Attendees"
+                  name="maxAttendee"
+                  value={newEvent.maxAttendee}
                   onChange={handleInputChange}
                   fullWidth
                 />

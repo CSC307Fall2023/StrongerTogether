@@ -290,6 +290,7 @@ export default function Profile() {
                   <div className="select-wrapper">
                     <NativeSelect
                       onChange={handleExperienceChange}
+                      defaultValue={experience} // fixed the edit bug
                       inputProps={{
                         name: "Frequency",
                         id: "uncontrolled-native",

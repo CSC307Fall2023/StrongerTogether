@@ -12,6 +12,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRETS,
 });
 
+
 export async function POST(request) {
   /**
    * Overview: take in a request from a form and

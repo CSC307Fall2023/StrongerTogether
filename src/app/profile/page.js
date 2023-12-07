@@ -15,9 +15,7 @@ import {
   NativeSelect,
 } from "@mui/material";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
-import { useSession } from "next-auth/react";
-import { useEffect } from "react";
-//import { useRouter } from "next/router";
+
 
 export default function Profile() {
   //const router = useRouter();
@@ -73,6 +71,7 @@ export default function Profile() {
     const month = months[date.getMonth()];
     const day = date.getDate();
     const year = date.getFullYear();
+ 
 
     // Combine the date components
     return `${month} ${day}, ${year}`;
@@ -146,31 +145,6 @@ export default function Profile() {
     fetchProfile();
   }, []);
 
-  // useEffect(async () => {
-  //   let userId = session?.user?.id;
-  //   try {
-
-  //   }
-  //     const response = await fetch("/api/users", {
-  //       method: "GET"
-  //     })
-  //     return response;
-  //   }
-  //   getId().then(
-  //     (response) => response.json()
-  //   ).then((user) => {
-  //     const {id, name, email, status, ProfileImage, shortBio, HostEvents, gymFrequency} = user;
-
-  //     setName(name);
-  //     setPrivate((check) => status === 'PRIVATE' ? true : false);
-  //     //setPhoto(ProfileImage)
-  //     setBio(shortBio)
-  //     setEvent(HostEvents)
-  //     setExperience(gymFrequency)
-  //     console.log(HostEvents) // this is returning undefined for some reason...
-  //   });
-
-  // }, []);
 
   const customButtonStyle = {
     backgroundColor: "#003831",

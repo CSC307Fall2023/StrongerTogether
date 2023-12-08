@@ -94,10 +94,9 @@ export async function DELETE(request, { params }) {
   const loggedInData = await checkLoggedIn();
   const id = +params.id;
   if (loggedInData.loggedIn && id) {
-    const todo = await prisma.toDo.delete({
+    const todo = await prisma.Post.delete({
       where: {
         id,
-        ownerId: loggedInData.user?.id,
       },
     });
     return NextResponse.json({ deleted: todo });

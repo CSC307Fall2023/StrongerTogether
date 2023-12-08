@@ -59,6 +59,7 @@ export async function GET(request) {
             id: checkUserById,
           },
           select: {
+            id: true,
             name: true,
             shortBio: true,
             ProfileImage: true,

@@ -4,6 +4,8 @@ import { useState } from "react";
 import "../profile.css";
 //import '../globals.css';
 
+
+
 import {
   Card,
   CardContent,
@@ -96,6 +98,29 @@ export default function Profile({ params }) {
     return `${hours}:${minutes}${ampm}`;
   }
 
+  console.log(friends);
+  const fetchFriends = async (userId) => {
+    try {
+      const response = await fetch(`/api/users?id=${userId}`, {
+        method: "GET",
+      });
+      if (response.ok) {
+        const userData = response.json();
+        const {
+          id,
+          name,
+          ProfileImage
+        } = userData;
+        return userData;
+
+      } else {
+        console.error("Failed to get user data");
+      }
+    } catch (error) {
+      console.error("Failed to fetch [user]:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -132,9 +157,21 @@ export default function Profile({ params }) {
           setPrivate(status === "PRIVATE" ? true : false);
           setExperience(gymFrequency ?? "No experience set");
           setFriendPending(pendingFriends);
-          setFriends(acceptedFriends);
+          // setFriends(acceptedFriends);
           setEvent(HostEvents);
           setPostCreated(Post);
+          console.log("Accepted Friends", acceptedFriends)
+          if (acceptedFriends.length > 0) {
+            Promise.all(acceptedFriends.map(fetchFriends)).then((listOfUsers) => {
+              console.log("What ist his: ", listOfUsers)
+              const actualFriends = listOfUsers.map((user) => ({
+                id: user.id,
+                name: user.name,
+                ProfileImage: user.ProfileImage
+              }));
+              setFriends(actualFriends);
+            });
+          }
         } else {
           console.error("Failed to get user data");
         }
@@ -149,6 +186,8 @@ export default function Profile({ params }) {
     backgroundColor: "#003831",
     color: "white",
   };
+
+
 
   const handleSaveProfile = async () => {
     try {
@@ -288,7 +327,7 @@ export default function Profile({ params }) {
               )}
             </div>
             <div className="profile-status">
-              <Button
+              {isEditing ? (<Button
                 className="spacing"
                 variant="contained"
                 onClick={isEditing ? toggleStatus : null}
@@ -296,7 +335,8 @@ export default function Profile({ params }) {
                 style={customButtonStyle}
               >
                 {isPrivate ? "Private" : "Public"}
-              </Button>
+              </Button>) : <item><b>{isPrivate ? "Private" : "Public"}</b></item>}
+              
             </div>
           </div>
           <div className="middle">
@@ -350,11 +390,22 @@ export default function Profile({ params }) {
                       </b>
                     </center>
                     <div className="eventContent">
-                      {friends.map((friend, index) => (
-                        <div key={index} className="friend">
-                          <Button>{friend}</Button>
-                        </div>
-                      ))}
+                      {
+                        friends.map((friend, index) => (
+                          <div key={index} className="friend">
+                            <Button href={`/profile/${friend.id}`}
+                            style={{textTransform: 'none'}}
+                            >
+                              <Avatar
+                                alt="Profile"
+                                src={friend.ProfileImage}
+                                sx={{ width: 20, height: 20, marginRight: 1}}
+                              />
+                              {friend.name}
+
+                            </Button>
+                          </div>))
+                      }
                     </div>
                   </div>
                 </CardContent>

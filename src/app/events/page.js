@@ -234,8 +234,32 @@ const Events = () => {
       !newEvent.location ||
       !newEvent.maxAttendee
     ) {
-      setErrorMessage('Missing required fields'); // Show an alert if any required field is empty
+      setErrorMessage('Missing required fields'); // alert if any required field is empty
       return; // Don't proceed further
+    }
+
+    // combine start time early so I can check if its valid
+    const startTime = new Date(newEvent.date + "T" + newEvent.startTime);
+    const endTime = new Date(newEvent.date + "T" + newEvent.endTime);
+    const now = new Date();
+
+    // Check if the event date is after today's date
+    if (startTime <= now) {
+      setErrorMessage("Event date must be after today's date");
+      return; // Don't proceed further
+    }
+
+    const eventStartTime = startTime.getHours();
+    const eventEndTime = endTime.getHours();
+
+    if ((eventStartTime >= 6 && eventStartTime < 24) && (eventEndTime > 6 && eventEndTime <= 24)) {
+      setErrorMessage("Event time must be after 6 am and before 12 am");
+      return; // Don't proceed further
+    }
+
+    if(eventStartTime >= eventEndTime) {
+      setErrorMessage("The start time must be before the end time")
+      return; //Don't proceed further
     }
 
     if (editIndex !== null) {
@@ -243,8 +267,6 @@ const Events = () => {
       updatedEvents[editIndex] = newEvent;
 
       // Combine date and time
-      const startTime = new Date(newEvent.date + "T" + newEvent.startTime);
-      const endTime = new Date(newEvent.date + "T" + newEvent.endTime);
       const ISOStartTime = startTime.toISOString();
       const ISOEndTime = endTime.toISOString();
 

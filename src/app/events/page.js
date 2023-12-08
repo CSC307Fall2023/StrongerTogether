@@ -253,15 +253,17 @@ const Events = () => {
       return; // Don't proceed further
     }
 
-    const eventStartTime = startTime.getHours();
-    const eventEndTime = endTime.getHours();
+    const eventStartTimeHr = startTime.getHours();
+    const eventEndTimeHr = endTime.getHours();
+    const eventStartTimeMin = startTime.getMinutes();
+    const eventEndTimeMin = endTime.getMinutes();
 
-    if (eventStartTime < 6 || eventStartTime > 24 || eventEndTime < 6 || eventEndTime > 24) {
+    if (eventStartTimeHr < 6 || eventStartTimeHr > 24 || eventEndTimeHr < 6 || eventEndTimeHr > 24) {
       setErrorMessage("Event time must be after 6 am and before 12 am");
       return; // Don't proceed further
     }
 
-    if(eventStartTime >= eventEndTime) {
+    if((eventStartTimeHr > eventEndTimeHr) || (eventStartTimeHr == eventEndTimeHr) && (eventStartTimeMin >= eventEndTimeMin)) {
       setErrorMessage("The start time must be before the end time")
       return; //Don't proceed further
     }

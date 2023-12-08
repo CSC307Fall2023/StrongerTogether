@@ -172,7 +172,7 @@ const Events = () => {
         });
         const data = await response.json();
         console.log("Events data", data);
-        const manyEvents = data.map((event) => {
+        let manyEvents = data.map((event) => {
           const {
             id,
             hostId,

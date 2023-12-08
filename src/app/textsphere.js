@@ -31,7 +31,7 @@ const TextShpere = () => {
         "Rest Day",
         "Form",
         "Compound exercises",
-        "Muscle Mommy"
+        
       ];
 
       const options = {

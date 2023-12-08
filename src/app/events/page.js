@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, getSession} from 'next-auth/react';
+import { useSession, getSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -13,14 +13,15 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import { Card, CardContent, Container, Paper, Typography } from "@mui/material";
-import ListItemButton from '@mui/material/ListItemButton';
-import Collapse from '@mui/material/Collapse';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import ListItemButton from "@mui/material/ListItemButton";
+import Collapse from "@mui/material/Collapse";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+
 import "../globals.css";
 
 const Events = () => {
-  const { data: session, status }  = useSession();
+  const { data: session, status } = useSession();
   let userId = session?.user?.id; // current userID
   const [events, setEvents] = useState([]);
   const [open, setOpen] = useState(false);
@@ -37,7 +38,7 @@ const Events = () => {
     goingCount: 0,
     maxAttendee: 0,
     EventFilter: [],
-    eventAttendee: []
+    eventAttendee: [],
   });
   
   const [errorMessage, setErrorMessage] = useState(""); //error message
@@ -87,7 +88,6 @@ const Events = () => {
   }
 
   const addEventData = async () => {
-
     // const [newEvent, setNewEvent] = useState({
     //     id: 0,
     //     hostId: 0,
@@ -103,66 +103,66 @@ const Events = () => {
     //     EventFilter: [],
     //   });
     try {
-        // Combine date and time
-        const startTime = new Date(newEvent.date + "T" + newEvent.startTime);
-        const endTime = new Date(newEvent.date + "T" + newEvent.endTime);
-        const ISOStartTime = startTime.toISOString();
-        const ISOEndTime = endTime.toISOString();
-        const eventData = {
-            eventName: newEvent.title,
-            location: newEvent.location,
-            startTime: ISOStartTime,
-            endTime: ISOEndTime,
-            maxAttendee: newEvent.maxAttendee,
-          }
-        
-        // Make a fetch request to your server endpoint
-        const response = await fetch("/api/events", {
-          method: 'POST',
-          body: JSON.stringify({
-            ...eventData
-          }),
-        });
-  
-        if (response.ok) {
-          const addedEvent = await response.json();
-          const {
-            id,
-            hostId,
-            eventName,
-            location,
-            startTime,
-            endTime,
-            maxAttendee,
-            EventFilter,
-            host: { name },
-          } = addedEvent;
-          console.log("addedEvent", addEventData)
-          setEvents((events) =>
-            [...events, {
-                id,
-                maxAttendee,
-                hostId,
-                title: eventName,
-                creator: name,
-                date: formatISO8601ToDateOnly(startTime),
-                startTime: formatISO8601ToTimeOnly(startTime),
-                endTime: formatISO8601ToTimeOnly(endTime),
-                location: location,
-                interestedCount: 0,
-                goingCount: 0,
-                EventFilter,
-                eventAttendee: []
+      // Combine date and time
+      const startTime = new Date(newEvent.date + "T" + newEvent.startTime);
+      const endTime = new Date(newEvent.date + "T" + newEvent.endTime);
+      const ISOStartTime = startTime.toISOString();
+      const ISOEndTime = endTime.toISOString();
+      const eventData = {
+        eventName: newEvent.title,
+        location: newEvent.location,
+        startTime: ISOStartTime,
+        endTime: ISOEndTime,
+        maxAttendee: newEvent.maxAttendee,
+      };
 
-            }]
-          );
-        } else {
-          console.error('Failed to add new post');
-        }
-      } catch (error) {
-        console.error('Error adding new Post:', error);
+      // Make a fetch request to your server endpoint
+      const response = await fetch("/api/events", {
+        method: "POST",
+        body: JSON.stringify({
+          ...eventData,
+        }),
+      });
+
+      if (response.ok) {
+        const addedEvent = await response.json();
+        const {
+          id,
+          hostId,
+          eventName,
+          location,
+          startTime,
+          endTime,
+          maxAttendee,
+          EventFilter,
+          host: { name },
+        } = addedEvent;
+        console.log("addedEvent", JSON.stringify(addedEvent));
+        setEvents((events) => [
+          ...events,
+          {
+            id,
+            maxAttendee,
+            hostId,
+            title: eventName,
+            creator: name,
+            date: formatISO8601ToDateOnly(startTime),
+            startTime: formatISO8601ToTimeOnly(startTime),
+            endTime: formatISO8601ToTimeOnly(endTime),
+            location: location,
+            interestedCount: 0,
+            goingCount: 0,
+            EventFilter,
+            eventAttendee: [],
+          },
+        ]);
+      } else {
+        console.error("Failed to add new post");
       }
-  }
+    } catch (error) {
+      console.error("Error adding new Post:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -184,9 +184,11 @@ const Events = () => {
             maxAttendee,
             EventFilter,
             host: { name },
-            EventAttendee
+            EventAttendee,
           } = event;
-          const eventAttendee = EventAttendee.map((attendee) => attendee.user.name);
+          const eventAttendee = EventAttendee.map(
+            (attendee) => attendee.user.name
+          );
           console.log("eventAttendee", eventAttendee);
           return {
             id,
@@ -201,7 +203,7 @@ const Events = () => {
             interestedCount: eventAttendee.length,
             goingCount: 0,
             EventFilter,
-            eventAttendee
+            eventAttendee,
           };
         });
 
@@ -211,7 +213,7 @@ const Events = () => {
       }
     };
     fetchEvents();
-  }, []);
+  }, [userInteractions]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -303,8 +305,8 @@ const Events = () => {
     });
     setOpen(false);
   };
-  
-  const handleRemoveEvent = async(index) => {
+
+  const handleRemoveEvent = async (index) => {
     const eventToRemove = events[index];
     if (eventToRemove.hostId === userId) {
       const updatedEvents = events.filter((event, i) => i !== index);
@@ -314,16 +316,19 @@ const Events = () => {
     }
 
     console.log(eventToRemove);
-
-    const response = await fetch("/api/events", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-          id: eventToRemove.id
-      }),
-    });
-    if (response.ok) {
-        console.log("event deleted")
+    try {
+      const response = await fetch("/api/events", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: eventToRemove.id,
+        }),
+      });
+      if (response.ok) {
+        console.log("event deleted");
+      }
+    } catch (error) {
+      console.error("Failed to delete event:", error);
     }
   };
 
@@ -342,7 +347,7 @@ const Events = () => {
   const handleInterested = async (index) => {
     const updatedEvents = [...events];
     const userInteracted = userInteractions[index]?.interested || false;
-    const eventId = updatedEvents[index]['id']
+    const eventId = updatedEvents[index]["id"];
     if (!userInteracted) {
       setUserInteractions({
         ...userInteractions,
@@ -357,22 +362,23 @@ const Events = () => {
     try {
       // Make a fetch request to your server endpoint
       const response = await fetch("/api/eventAttendee", {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify({
-          eventId
+          eventId,
         }),
       });
 
       if (response.ok) {
         const updatedEvent = await response.json();
-        if (updatedEvent.type === "create") updatedEvents[index].interestedCount++;
+        if (updatedEvent.type === "create")
+          updatedEvents[index].interestedCount++;
         else updatedEvents[index].interestedCount--;
         setEvents(updatedEvents);
       } else {
-        console.error('Failed to update like count');
+        console.error("Failed to update like count");
       }
     } catch (error) {
-      console.error('Error updating like count:', error);
+      console.error("Error updating like count:", error);
     }
   };
 
@@ -408,13 +414,13 @@ const Events = () => {
             alignItems: "stretch",
           }}
         >
-          <div> 
+          <div>
             <List>
               {events.map((event, index) => (
                 <ListItem key={index}>
                   <Card>
                     <CardContent>
-                      <div style={{ margin: "10px 20px", width: 500}}>
+                      <div style={{ margin: "10px 20px", width: 500 }}>
                         <Typography variant="h6" className="events-name">
                           {event.title}
                         </Typography>
@@ -447,26 +453,43 @@ const Events = () => {
                             className="events-info-button"
                             startIcon={<ThumbUpIcon />}
                             onClick={() => handleInterested(index)}
+                            sx={{margin: "20px auto", width: "225px", height: "50px"}}
                           >
                             Interested ({event.interestedCount})
                           </Button>
                           <ListItemButton onClick={() => handleGoing(index)}>
                             <ListItemText primary="Who's Going?" />
-                            {userInteractions[index]?.going ? <ExpandLess /> : <ExpandMore />}
+                            {userInteractions[index]?.going ? (
+                              <ExpandLess />
+                            ) : (
+                              <ExpandMore />
+                            )}
                           </ListItemButton>
-                          <Collapse in={userInteractions[index]?.going} timeout="auto" unmountOnExit>
-                          <List component="div" disablePadding>
-                            <ListItemButton sx={{ pl: 4 }}>
-                              {events[index]['eventAttendee'].length > 0 ? (
-                                events[index]['eventAttendee'].map((attendeeName, attendeeIndex) => (
-                                  <ListItemText key={attendeeIndex} primary={attendeeName} />
-                                ))
+                          <Collapse
+                            in={userInteractions[index]?.going}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <List component="div" disablePadding>
+                              {events[index]["eventAttendee"].length > 0 ? (
+                                events[index]["eventAttendee"].map(
+                                  (attendeeName, attendeeIndex) => (
+                                    <ListItemText
+                                      sx={{ margin: "10px auto 20px 40px" }}
+                                      key={attendeeIndex}
+                                      primary={attendeeName}
+                                    />
+                                  )
+                                )
                               ) : (
-                                <ListItemText key={index} primary="No One :(" />
+                                <ListItemText
+                                  key={index}
+                                  primary="No One :("
+                                  sx={{ margin: "10px auto 20px 40px" }}
+                                />
                               )}
-                            </ListItemButton>
-                          </List>
-                        </Collapse>
+                            </List>
+                          </Collapse>
                           {/* <Button
                             className="events-info-button"
                             startIcon={<EventIcon />}
@@ -475,20 +498,22 @@ const Events = () => {
                             Going ({event.goingCount})
                           </Button> */}
                           {event.hostId === userId && (
-                            <>
-                              <Button
+                            <div style={{display: "flex", justifyContent: "space-evenly", marginTop: "20px"}}>
+                            <Button
                                 className="events-info-button"
                                 onClick={() => handleRemoveEvent(index)}
+                                sx={{width: "225px"}}
                               >
                                 Delete
                               </Button>
                               <Button
                                 className="events-info-button"
                                 onClick={() => handleEditEvent(index)}
+                                sx={{width: "225px"}}
                               >
                                 Edit
                               </Button>
-                            </>
+                            </div>
                           )}
                         </div>
                       </div>

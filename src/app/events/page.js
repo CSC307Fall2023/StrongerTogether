@@ -40,7 +40,8 @@ const Events = () => {
     EventFilter: [],
     eventAttendee: [],
   });
-
+  
+  const [errorMessage, setErrorMessage] = useState(""); //error message
   const [editIndex, setEditIndex] = useState(null);
 
   // track user interactions
@@ -170,8 +171,20 @@ const Events = () => {
           method: "GET",
         });
         const data = await response.json();
+        data.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+
+        const now = new Date();
+        let i = 0;
+        while (i < data.length) {
+          if (new Date(data[i].startTime) < now) {
+            data.splice(i, 1);
+          } else {
+            i++;
+          }
+        }
+
         console.log("Events data", data);
-        const manyEvents = data.map((event) => {
+        let manyEvents = data.map((event) => {
           const {
             id,
             hostId,
@@ -204,6 +217,7 @@ const Events = () => {
             eventAttendee,
           };
         });
+
         setEvents(manyEvents);
       } catch (error) {
         console.error("Failed to fetch [posts]:", error);
@@ -226,7 +240,7 @@ const Events = () => {
     setNewEvent({ ...newEvent, [name]: value });
   };
 
-  const handleAddEvent = () => {
+  const handleAddEvent = async() => {
     if (
       !newEvent.title ||
       !newEvent.date ||
@@ -235,13 +249,58 @@ const Events = () => {
       !newEvent.location ||
       !newEvent.maxAttendee
     ) {
-      alert("Missing required fields"); // Show an alert if any required field is empty
+      setErrorMessage('Missing required fields'); // alert if any required field is empty
       return; // Don't proceed further
+    }
+
+    // combine start time early so I can check if its valid
+    const startTime = new Date(newEvent.date + "T" + newEvent.startTime);
+    const endTime = new Date(newEvent.date + "T" + newEvent.endTime);
+    const now = new Date();
+
+    // Check if the event date is after today's date
+    if (startTime < now) {
+      setErrorMessage("Event date must be after today's date");
+      return; // Don't proceed further
+    }
+
+    const eventStartTimeHr = startTime.getHours();
+    const eventEndTimeHr = endTime.getHours();
+    const eventStartTimeMin = startTime.getMinutes();
+    const eventEndTimeMin = endTime.getMinutes();
+
+    if (eventStartTimeHr < 6 || eventStartTimeHr > 24 || eventEndTimeHr < 6 || eventEndTimeHr > 24) {
+      setErrorMessage("Event time must be after 6 am and before 12 am");
+      return; // Don't proceed further
+    }
+
+    if((eventStartTimeHr > eventEndTimeHr) || (eventStartTimeHr == eventEndTimeHr) && (eventStartTimeMin >= eventEndTimeMin)) {
+      setErrorMessage("The start time must be before the end time")
+      return; //Don't proceed further
     }
 
     if (editIndex !== null) {
       const updatedEvents = [...events];
       updatedEvents[editIndex] = newEvent;
+
+      // Combine date and time
+      const ISOStartTime = startTime.toISOString();
+      const ISOEndTime = endTime.toISOString();
+
+      const response = await fetch("/api/events", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: newEvent.id,
+          eventName: newEvent.title,
+          location: newEvent.location,
+          startTime: ISOStartTime,
+          endTime: ISOEndTime,
+          maxAttendee: newEvent.maxAttendee,
+          filterIds: [6]
+        }),
+      });
+
       setEvents(updatedEvents);
       setEditIndex(null);
     } else {
@@ -540,7 +599,11 @@ const Events = () => {
                   onChange={handleInputChange}
                   fullWidth
                 />
-                {/* Rest of form fields if need more */}
+                {errorMessage && (
+                  <Typography color="error">
+                    {errorMessage}
+                  </Typography>
+                )}
               </DialogContent>
               <DialogActions>
                 <Button

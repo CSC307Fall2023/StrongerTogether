@@ -1,5 +1,5 @@
 "use client";
-
+import * as React from 'react';
 import { useState } from "react";
 import "../profile.css";
 //import '../globals.css';
@@ -15,11 +15,20 @@ import {
   Avatar,
   InputLabel,
   NativeSelect,
+  Drawer,
+  Box,
+  IconButton
 } from "@mui/material";
+import CheckIcon from '@mui/icons-material/Check';
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import CloseIcon from '@mui/icons-material/Close';
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
 
 export default function Profile({ params }) {
   const pathname = usePathname();
@@ -34,6 +43,19 @@ export default function Profile({ params }) {
   const [postCreated, setPostCreated] = useState([]);
   const [friendPending, setFriendPending] = useState([]);
   const [friends, setFriends] = useState([]);
+
+  //drawer defs
+  const [state, setState] = React.useState({
+    right: false,
+  });
+
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+    setState({ ...state, [anchor]: open });
+  };
+
 
   // TODO: add useState for interested in, upcoming events, forum activities
   const { data: session, status } = useSession();
@@ -146,9 +168,12 @@ export default function Profile({ params }) {
             ...initiatedFriendships,
             ...receivedFriendships,
           ];
-          const pendingFriends = receivedFriendships.map(
-            (friend) => friend["initiatorId"]
-          );
+          // const pendingFriends = receivedFriendships.map(
+          //   (friend) => friend["initiatorId"]
+          const pendingFriends = combinedFriends
+            .filter((friend) => friend["status"] === "PENDING")
+            .map((friend) => friend?.recipientId ?? friend?.initiatorId);
+          console.log("pendingFriends: ", pendingFriends)
           const acceptedFriends = combinedFriends
             .filter((friend) => friend["status"] === "ACCEPTED")
             .map((friend) => friend?.recipientId ?? friend?.initiatorId);
@@ -157,14 +182,28 @@ export default function Profile({ params }) {
           setPhoto(ProfileImage);
           setPrivate(status === "PRIVATE" ? true : false);
           setExperience(gymFrequency ?? "No experience set");
-          setFriendPending(pendingFriends);
+          //setFriendPending(pendingFriends);
           // setFriends(acceptedFriends);
           setEvent(HostEvents);
           setPostCreated(Post);
-          console.log("Accepted Friends", acceptedFriends)
+
+          console.log(friendPending.length);
+
+          Promise.all(pendingFriends.map(fetchFriends)).then((listOfUsers) => {
+            console.log("What ist his: ", listOfUsers)
+            const pendingFriends = listOfUsers.map((user) => ({
+              id: user.id,
+              name: user.name,
+              ProfileImage: user.ProfileImage
+            }));
+            setFriendPending(pendingFriends);
+          });
+
+
+
+
           if (acceptedFriends.length > 0) {
             Promise.all(acceptedFriends.map(fetchFriends)).then((listOfUsers) => {
-              console.log("What ist his: ", listOfUsers)
               const actualFriends = listOfUsers.map((user) => ({
                 id: user.id,
                 name: user.name,
@@ -247,16 +286,76 @@ export default function Profile({ params }) {
     setExperience(e.target.value);
   };
 
+  const list = (anchor) => (
+    <Box
+      sx={{ width: anchor === 'top' || anchor === 'bottom' ? 'auto' : 250 }}
+      role="presentation"
+      onClick={toggleDrawer(anchor, false)}
+      onKeyDown={toggleDrawer(anchor, false)}
+    >
+      <div className='friendRequests'>
+        <center>Pending Friend Requests</center>
+      </div>
+      <Divider />
+      <List>
+        {friendPending.map((friend, index) => (
+
+          <div key={index} className="friend">
+            <center>
+              <Button href={`/profile/${friend.id}`}
+                style={{ textTransform: 'none' }}
+              >
+                <Avatar
+                  alt="Profile"
+                  src={friend.ProfileImage}
+                  sx={{ width: 20, height: 20, marginRight: 1 }}
+                />
+                {friend.name}
+              </Button>
+              <IconButton
+                aria-label="Accept"
+                style={{ color: "#27632a" }}>
+                <CheckIcon />
+              </IconButton>
+              <IconButton
+                aria-label="Decline"
+                style={{ color: '#d32f2f' }}>
+                <CloseIcon />
+              </IconButton>
+            </center>
+          </div>
+        ))
+        }
+      </List>
+    </Box>
+  );
+
+
   return (
     <div className="background">
       <div className="profile-container">
         <div className="profile-form">
+          <div className='top-right'>
+            {[<PersonAddIcon style={{color: '#003831'}}/>].map((anchor) => (
+              <>
+                <Button onClick={toggleDrawer(anchor, true)}>
+                  {anchor}
+                </Button>
+                <Drawer
+                  anchor='right'
+                  open={state[anchor]}
+                  onClose={toggleDrawer(anchor, false)}
+                >
+                  {list(anchor)}
+                </Drawer>
+              </>
+            ))}
+          </div>
           <div className="profile-photo">
             <center>
               <Avatar
                 alt="Profile"
                 src={photo}
-                // src={URL.createObjectURL(photo)}
                 sx={{ width: 150, height: 150 }}
               />
               <input
@@ -282,18 +381,21 @@ export default function Profile({ params }) {
                 </label>
               )}
               {currentUserId === userId ? (
-                <Button
-                  className="spacing"
-                  variant="text"
-                  onClick={() => {
-                    toggleEditing();
-                    console.log("editing", isEditing);
-                    isEditing ? handleSaveProfile() : null;
-                  }}
-                  size="small"
-                >
-                  {isEditing ? "Save" : "Edit"}
-                </Button>
+                <div>
+                  <Button
+                    className="spacing"
+                    variant="text"
+                    onClick={() => {
+                      toggleEditing();
+                      console.log("editing", isEditing);
+                      isEditing ? handleSaveProfile() : null;
+                    }}
+                    size="small"
+                  >
+                    {isEditing ? "Save" : "Edit"}
+                  </Button>
+                </div>
+
               ) : null}
             </center>
           </div>
@@ -337,7 +439,7 @@ export default function Profile({ params }) {
               >
                 {isPrivate ? "Private" : "Public"}
               </Button>) : <item><b>{isPrivate ? "Private" : "Public"}</b></item>}
-              
+
             </div>
           </div>
           <div className="middle">
@@ -395,12 +497,12 @@ export default function Profile({ params }) {
                         friends.map((friend, index) => (
                           <div key={index} className="friend">
                             <Button href={`/profile/${friend.id}`}
-                            style={{textTransform: 'none'}}
+                              style={{ textTransform: 'none' }}
                             >
                               <Avatar
                                 alt="Profile"
                                 src={friend.ProfileImage}
-                                sx={{ width: 20, height: 20, marginRight: 1}}
+                                sx={{ width: 20, height: 20, marginRight: 1 }}
                               />
                               {friend.name}
 

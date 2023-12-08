@@ -20,14 +20,13 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 export default function Profile({ params }) {
-  const pathname = usePathname();
   const [isEditing, setIsEditing] = useState(false);
   const [isPrivate, setPrivate] = useState(false);
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [photo, setPhoto] = useState("");
   const [experience, setExperience] = useState("No experience set");
-  const [errorMessage, setErrorMessage] = useState("");
+  // const [errorMessage, setErrorMessage] = useState("");
   const [HostEvents, setEvent] = useState([]);
   const [postCreated, setPostCreated] = useState([]);
   const [friendPending, setFriendPending] = useState([]);

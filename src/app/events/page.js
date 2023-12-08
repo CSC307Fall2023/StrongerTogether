@@ -270,7 +270,7 @@ const Events = () => {
     const eventStartTime = startTime.getHours();
     const eventEndTime = endTime.getHours();
 
-    if ((eventStartTime >= 6 && eventStartTime < 24) && (eventEndTime > 6 && eventEndTime <= 24)) {
+    if (eventStartTime < 6 || eventStartTime >= 24 || eventEndTime <= 6 || eventEndTime > 24) {
       setErrorMessage("Event time must be after 6 am and before 12 am");
       return; // Don't proceed further
     }

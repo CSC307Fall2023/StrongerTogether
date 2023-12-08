@@ -47,9 +47,9 @@ model User {
 
 model Friendship {
   // model different friendship relationships using User1 -> User2 model 
-  initiator   User             @relation("FriendshipInitiator", fields: [initiatorId], references: [id])
+  initiator   User             @relation("FriendshipInitiator", fields: [initiatorId], references: [id], onDelete: Cascade)
   initiatorId Int
-  recipient   User             @relation("FriendshipRecipient", fields: [recipientId], references: [id])
+  recipient   User             @relation("FriendshipRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
   recipientId Int
   status      FriendshipStatus @default(PENDING)
 
@@ -62,7 +62,7 @@ model Post {
   postTitle       String
   postDescription String
   authorId        Int
-  author          User          @relation(fields: [authorId], references: [id])
+  author          User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
   createdAt       DateTime      @default(now()) // creation time
   Votes           Votes[]
   Comment         Comment[]
@@ -74,9 +74,9 @@ model Votes {
   id     Int      @id @default(autoincrement())
   type   VoteType
   postId Int
-  post   Post     @relation(fields: [postId], references: [id])
+  post   Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId Int
-  user   User     @relation(fields: [userId], references: [id])
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId]) // user cannot vote multiple times on the same post
 }
@@ -87,18 +87,18 @@ model Comment {
   comment   String
   postId    Int
   createdAt DateTime @default(now()) // creation time
-  post      Post     @relation(fields: [postId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PostFilters {
   // all the post filters for certain post
   id               Int             @id @default(autoincrement())
   postId           Int
-  post             Post            @relation(fields: [postId], references: [id])
+  post             Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
   possibleFilterId Int
-  possibleFilter   PossibleFilters @relation(fields: [possibleFilterId], references: [id])
+  possibleFilter   PossibleFilters @relation(fields: [possibleFilterId], references: [id], onDelete: Cascade)
 
   @@unique([postId, possibleFilterId])
 }
@@ -141,7 +141,7 @@ model EventFilter {
   eventId          Int
   Event            Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
   possibleFilterId Int
-  possibleFilter   PossibleFilters @relation(fields: [possibleFilterId], references: [id])
+  possibleFilter   PossibleFilters @relation(fields: [possibleFilterId], references: [id], onDelete: Cascade)
 
   @@unique([eventId, possibleFilterId])
 }

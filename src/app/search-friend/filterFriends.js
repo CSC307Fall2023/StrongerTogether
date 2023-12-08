@@ -1,10 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Stack } from "@mui/system";
 import { Paper, Box, Typography } from "@mui/material";
-import IconButton from '@mui/material/IconButton';
-import AddIcon from '@mui/icons-material/Add';
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+import {
+  Card,
+  CardContent,
+  Button,
+  TextField,
+  FormControl,
+  Avatar,
+  InputLabel,
+  NativeSelect,
+} from "@mui/material";
 
-export default function FilterFriends({ friendList }) {
+
+
+export default function FilterFriends({ friendList, handleFriendRequest }) {
+  console.log("friendList", friendList);
   return (
     <Box sx={{ width: "80%" }}>
       <Stack
@@ -22,9 +35,9 @@ export default function FilterFriends({ friendList }) {
             alignItems: "stretch",
           }}
         >
-          {friendList.map((item) => (
+          {friendList.map((User) => (
             <Paper
-              key={item.id}
+              key={User.id}
               sx={{
                 textAlign: "left",
                 // margin: ""
@@ -42,14 +55,22 @@ export default function FilterFriends({ friendList }) {
                 <Typography
                   style={{ display: "flex", alignItems: "center", height: 70 }}
                 >
-                  {item.image} - {item.name}
+                <Button href={`/profile/${User.id}`} style={{textTransform: 'none'}}>
+                  <Avatar
+                    alt="Profile"
+                    src={User.ProfileImage}
+                    sx={{ width: 40, height: 40, marginRight: 2 }}
+                  />
+                  {User.name}
+                  </Button>
                 </Typography>
                 <div
                   style={{
                     display: "flex",
                     flexDirection: "row",
                     justifyContent: "space-between",
-                    width: "20%",
+                    alignItems: "center",
+                    width: "35%",
                   }}
                 >
                   <Typography
@@ -59,12 +80,18 @@ export default function FilterFriends({ friendList }) {
                       height: 70,
                     }}
                   >
-                    <IconButton
+                    {/* <IconButton
                       color="primary"
                       aria-label="add to shopping cart"
                     >
                       <AddIcon />
-                    </IconButton>
+                    </IconButton> */}
+                    {User.friendshipStatus === "NONE" ? (<Button
+                      className="events-info-button"
+                      onClick={() => handleFriendRequest(User.id)}
+                    >
+                      Send Request
+                    </Button>) : User.friendshipStatus}
                   </Typography>
                   <Typography
                     style={{
@@ -73,7 +100,7 @@ export default function FilterFriends({ friendList }) {
                       height: 70,
                     }}
                   >
-                    {item.status}
+                    {User.status}
                   </Typography>
                 </div>
               </div>

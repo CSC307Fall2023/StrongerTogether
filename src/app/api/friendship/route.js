@@ -37,12 +37,13 @@ async function check_friends_exist(currentUserId, friendId) {
 
 export async function POST(request) {
   // POST request to add friends
-  // const loggedInData = await checkLoggedIn();
-  if (true) {
+  const loggedInData = await checkLoggedIn();
+  if (loggedInData.loggedIn) {
     // if user is logged in, then create the event if needed
-    const userId = 1;
+    const userId = loggedInData.user.id;
     const responseData = await request.json();
-    const { friendId } = responseData;
+    let { friendId } = responseData;
+    friendId = parseInt(friendId);
     responseData;
     const friendshipData = {
       initiatorId: userId,
@@ -150,10 +151,10 @@ export async function POST(request) {
 
 export async function PUT(request) {
   // This HTTP PUT request is used to update status of friendship. So update to accept
-  // const loggedInData = await checkLoggedIn();
-  if (true) {
+  const loggedInData = await checkLoggedIn();
+  if (loggedInData.loggedIn) {
     const responseData = await request.json();
-    const userId = 2;
+    const userId = loggedInData.user.id;
     const { initiatorId } = responseData; // Need the initiator id in ordre to acecpt them as friends
     const friendRequestAcceptedBy = {
       initiatorId_recipientId: {
@@ -182,10 +183,10 @@ export async function PUT(request) {
 
 export async function DELETE(request) {
   // delete friendship
-  // const loggedInData = await checkLoggedIn();
-  if (true) {
+  const loggedInData = await checkLoggedIn();
+  if (loggedInData.loggedIn) {
     const responseData = await request.json();
-    const userId = 1;
+    const userId = loggedInData.user.id;
     const { friendId } = responseData;
     let unfriend
     try {

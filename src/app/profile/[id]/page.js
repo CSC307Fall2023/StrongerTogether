@@ -101,16 +101,11 @@ export default function Profile({ params }) {
   console.log(friends);
   const fetchFriends = async (userId) => {
     try {
-      const response = await fetch(`/api/users?id=${userId}`, {
+      const response = await fetch(`/api/users/${userId}`, {
         method: "GET",
       });
       if (response.ok) {
         const userData = response.json();
-        const {
-          id,
-          name,
-          ProfileImage
-        } = userData;
         return userData;
 
       } else {
@@ -124,7 +119,7 @@ export default function Profile({ params }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`/api/users?id=${userId}`, {
+        const response = await fetch(`/api/users/${userId}`, {
           method: "GET",
         });
         if (response.ok) {

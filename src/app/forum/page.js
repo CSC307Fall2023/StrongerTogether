@@ -71,6 +71,7 @@ const Forum = () => {
   const [postDescription, setPostDescription] = useState('');
   const [showNewPostPopup, setShowNewPostPopup] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedFilters, setSelectedFilters] = useState([]); // Filtering posts by tags
   const [posts, setPosts] = useState([]);
 
   const { data : session, status} = useSession();
@@ -172,9 +173,17 @@ const Forum = () => {
       setSelectedTags((prevSelected) => [...prevSelected, tag]);
     }
   };
+
+  const handleFilterChange = (filter) => {
+    if (selectedFilters.includes(filter)) {
+      setSelectedFilters(selectedFilters.filter(f => f !== filter));
+    } else {
+      setSelectedFilters([...selectedFilters, filter]);
+    }
+  };
+
   
   const handleNewPostSubmit = async () => {
-
     // Perform validation
     const response = await fetch("/api/forums", {
       method: "POST",
@@ -182,6 +191,7 @@ const Forum = () => {
         postTitle: postTitle,
         postDescription: postDescription,
         authorId: userId,
+        PostFilters: selectedTags,
       }),
     });
 
@@ -191,6 +201,7 @@ const Forum = () => {
         postTitle: postTitle,
         postDescription: postDescription,
         authorId: userId,
+        PostFilters: selectedTags,
       });
     }
 
@@ -217,14 +228,18 @@ const Forum = () => {
           </button>
           <div className="filters-box">
             <h2>Filters</h2>
-            <ul>
-              <li>General</li>
-              <li>Discussions</li>
-              <li>Sports</li>
-              <li>Exercise</li>
-              <li>ASI</li>
-              <li>Events</li>
-            </ul>
+            {tagOptions.map((tag, index) => (
+              <div key={index}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selectedFilters.includes(tag)}
+                    onChange={() => handleFilterChange(tag)}
+                  />
+                  {tag}
+                </label>
+              </div>
+            ))}
           </div>
           <div className="my-options-box">
             <h2>My Options</h2>

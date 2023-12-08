@@ -172,6 +172,17 @@ const Events = () => {
         });
         const data = await response.json();
         data.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+
+        const now = new Date();
+        let i = 0;
+        while (i < data.length) {
+          if (new Date(data[i].startTime) < now) {
+            data.splice(i, 1);
+          } else {
+            i++;
+          }
+        }
+
         console.log("Events data", data);
         let manyEvents = data.map((event) => {
           const {

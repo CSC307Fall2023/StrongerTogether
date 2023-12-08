@@ -171,6 +171,7 @@ const Events = () => {
           method: "GET",
         });
         const data = await response.json();
+        data.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
         console.log("Events data", data);
         let manyEvents = data.map((event) => {
           const {
@@ -202,23 +203,6 @@ const Events = () => {
             EventFilter,
             eventAttendee
           };
-        });
-
-        manyEvents.sort((a, b) => {
-          // Compare dates first
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-        
-          if (dateA < dateB) {
-            return -1; // a comes before b
-          } else if (dateA > dateB) {
-            return 1; // b comes before a
-          } else {
-            // If dates are equal, compare times
-            const timeA = new Date(`1970-01-01T${a.startTime}`);
-            const timeB = new Date(`1970-01-01T${b.startTime}`);
-            return timeA - timeB;
-          }
         });
 
         setEvents(manyEvents);

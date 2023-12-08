@@ -328,7 +328,7 @@ export default function Profile({ params }) {
               )}
             </div>
             <div className="profile-status">
-              <Button
+              {isEditing ? (<Button
                 className="spacing"
                 variant="contained"
                 onClick={isEditing ? toggleStatus : null}
@@ -336,7 +336,8 @@ export default function Profile({ params }) {
                 style={customButtonStyle}
               >
                 {isPrivate ? "Private" : "Public"}
-              </Button>
+              </Button>) : <item><b>{isPrivate ? "Private" : "Public"}</b></item>}
+              
             </div>
           </div>
           <div className="middle">

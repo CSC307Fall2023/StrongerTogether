@@ -14,7 +14,7 @@ export default function SearchFriends() {
   const [friendList, setfriendList] = useState([]);
   const [filteredFriends, setFilteredFriends] = useState([]);
   const [page, setPage] = useState(1);
-  const [interactions, setInteractions] = useState(false);
+  // const [interactions, setInteractions] = useState(false);
   const itemsPerPage = 8;
   const dummyFriends = [
     {
@@ -106,7 +106,13 @@ export default function SearchFriends() {
         })
       });
       if (response.ok) {
-        setInteractions((prev) => (!prev))
+        setFilteredFriends(filteredFriends.map(user => {
+          if (user.id === friendId) {
+            return { ...user, status: "PENDING" };
+          } else {
+            return user;
+          }
+        }));
       } else {
         console.log("Failed to fetch user data");
       }
@@ -151,7 +157,7 @@ export default function SearchFriends() {
       }
     };
     fetchPeople();
-  }, [interactions]);
+  }, []);
 
   return (
     <Box

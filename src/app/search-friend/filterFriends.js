@@ -17,7 +17,17 @@ import {
 
 
 export default function FilterFriends({ friendList, handleFriendRequest }) {
-  console.log("friendList", friendList);
+
+  // const handleClickRequest = (id) => {
+  //   handleFriendRequest
+  //   setFilteredFriends(filteredFriends.map(user => {
+  //     if (user.id === friendId) {
+  //       return { ...user, status: "PENDING" };
+  //     } else {
+  //       return user;
+  //     }
+  //   }));
+  // }
   return (
     <Box sx={{ width: "80%" }}>
       <Stack

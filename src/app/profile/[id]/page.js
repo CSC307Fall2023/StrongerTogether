@@ -330,7 +330,7 @@ export default function Profile({ params }) {
       <div className="profile-container">
         <div className="profile-form">
           <div className='top-right'>
-            {[<PersonAddIcon style={{color: '#003831'}}/>].map((anchor) => (
+            {userId === currentUserId ? [<PersonAddIcon style={{color: '#003831'}}/>].map((anchor) => (
               <>
                 <Button onClick={toggleDrawer(anchor, true)}>
                   {anchor}
@@ -343,7 +343,7 @@ export default function Profile({ params }) {
                   {list(anchor)}
                 </Drawer>
               </>
-            ))}
+            )) : null}
           </div>
           <div className="profile-photo">
             <center>

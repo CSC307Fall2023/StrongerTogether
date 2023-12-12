@@ -86,6 +86,7 @@ export default function SearchFriends() {
   const handleInput = (e) => {
     const targetValue = e.target.value.toLowerCase();
     setInput(targetValue);
+    console.log(friendList)
     const newFriends = friendList.filter((element) => {
       if (targetValue === "") {
         return element;
@@ -94,6 +95,7 @@ export default function SearchFriends() {
       }
     });
     console.log("newFriends", newFriends);
+    setPage(1);
     setFilteredFriends(newFriends);
   };
 
@@ -108,7 +110,7 @@ export default function SearchFriends() {
       if (response.ok) {
         setFilteredFriends(filteredFriends.map(user => {
           if (user.id === friendId) {
-            return { ...user, status: "PENDING" };
+            return { ...user, friendshipStatus: "PENDING" };
           } else {
             return user;
           }

@@ -16,6 +16,7 @@ const Forum = () => {
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [selectedFiltersIds, setSelectedFiltersIds] = useState([]); // Filtering posts by tags
   const [posts, setPosts] = useState([]);
+  const [userInteraction, setUserInteraction] = useState(false);
 
   const { data : session, status} = useSession();
   let userId = session?.user?.id;
@@ -34,7 +35,7 @@ const Forum = () => {
       }
     };
     fetchPosts();
-  }, []);
+  }, [userInteraction]);
 
   const handleNewPostClick = () => {
     setShowNewPostPopup(true);
@@ -68,6 +69,7 @@ const Forum = () => {
             post.id === updatedPost.id ? updatedPost : post
           )
         );
+        setUserInteraction(!userInteraction);
       } else {
         console.error('Failed to update like count');
       }
@@ -97,6 +99,7 @@ const Forum = () => {
             post.id === updatedPost.id ? updatedPost : post
           )
         );
+        setUserInteraction(!userInteraction);
       } else {
         console.error('Failed to update like count');
       }
@@ -236,7 +239,7 @@ const Forum = () => {
               <div className="post-details">
                 <h3 className="post-title">{post.postTitle}</h3>
                 <div className='post-author-tags'>
-                  <p className="post-author">Posted by: {post.authorId}</p>
+                  <p className="post-author">Posted by: {post.name}</p>
                   {/* <p className="post-tags">Tags: {post.PostFilters && Array.isArray(post.PostFilters) ? post.PostFilters.join(', ') : ''}</p> */}
                   <p className="post-votes">Votes: {post.total_vote}</p>
 

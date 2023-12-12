@@ -1,10 +1,8 @@
 "use client";
-
+import * as React from "react";
 import { useState } from "react";
 import "../profile.css";
 //import '../globals.css';
-
-
 
 import {
   Card,
@@ -15,49 +13,72 @@ import {
   Avatar,
   InputLabel,
   NativeSelect,
+  Drawer,
+  Box,
+  IconButton,
 } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import CloseIcon from "@mui/icons-material/Close";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+
 export default function Profile({ params }) {
-  const pathname = usePathname();
   const [isEditing, setIsEditing] = useState(false);
   const [isPrivate, setPrivate] = useState(false);
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [photo, setPhoto] = useState("");
   const [experience, setExperience] = useState("No experience set");
-  const [errorMessage, setErrorMessage] = useState("");
+  // const [errorMessage, setErrorMessage] = useState("");
   const [HostEvents, setEvent] = useState([]);
   const [postCreated, setPostCreated] = useState([]);
   const [friendPending, setFriendPending] = useState([]);
   const [friends, setFriends] = useState([]);
+
+  //drawer defs
+  const [state, setState] = React.useState({
+    right: false,
+  });
+
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+    setState({ ...state, [anchor]: open });
+  };
 
   // TODO: add useState for interested in, upcoming events, forum activities
   const { data: session, status } = useSession();
   let currentUserId = session?.user?.id; // current userID
   let { id: userId } = params;
   userId = parseInt(userId);
-  console.log("currentUsrId", currentUserId)
-  console.log("UsrId", userId)
-  console.log(
-    JSON.stringify(
-      {
-        name,
-        bio,
-        photo,
-        experience,
-        HostEvents,
-        postCreated,
-        friendPending,
-        friends,
-      },
-      null,
-      2
-    )
-  );
+  // console.log("currentUsrId", currentUserId);
+  // console.log("UsrId", userId);
+  // console.log(
+  //   JSON.stringify(
+  //     {
+  //       name,
+  //       bio,
+  //       photo,
+  //       experience,
+  //       HostEvents,
+  //       postCreated,
+  //       friendPending,
+  //       friends,
+  //     },
+  //     null,
+  //     2
+  //   )
+  // );
 
   function formatISO8601ToDateOnly(isoString) {
     const date = new Date(isoString);
@@ -99,23 +120,67 @@ export default function Profile({ params }) {
     return `${hours}:${minutes}${ampm}`;
   }
 
-  console.log(friends);
+  // console.log(friends);
   const fetchFriends = async (userId) => {
     try {
-      const response = await fetch(`/api/users?id=${userId}`, {
+      const response = await fetch(`/api/users/${userId}`, {
         method: "GET",
       });
       if (response.ok) {
         const userData = response.json();
-        const {
-          id,
-          name,
-          ProfileImage
-        } = userData;
         return userData;
-
       } else {
         console.error("Failed to get user data");
+      }
+    } catch (error) {
+      console.error("Failed to fetch [user]:", error);
+    }
+  };
+
+  const handleAcceptFriendRequest = async (userId) => {
+    // console.log("USER ID", userId)
+    try {
+      const response = await fetch(`/api/friendship/`, {
+        method: "PUT",
+        body: JSON.stringify({
+          initiatorId: userId,
+        }),
+      });
+      if (response.ok) {
+        const acceptedFriend = await response.json();
+        setFriendPending((prevFriendPending) => {
+          return prevFriendPending.filter(
+            (pendingFriend) => pendingFriend.id !== userId
+          );
+        });
+        setFriends((prevFriends) => {
+          return [...prevFriends, acceptedFriend?.initiator]
+        })
+      } else {
+        console.error("Failed to accept friend request or server error");
+      }
+    } catch (error) {
+      console.error("Failed to fetch [user]:", error);
+    }
+  };
+  const handleDeclineFriendRequest = async (userId) => {
+    try {
+      const response = await fetch(`/api/friendship/`, {
+        method: "DELETE",
+        body: JSON.stringify({
+          friendId: userId,
+        }),
+      });
+      if (response.ok) {
+        const message = await response.json();
+        console.log(message.message);
+        setFriendPending((prevFriendPending) => {
+          return prevFriendPending.filter(
+            (pendingFriend) => pendingFriend.id !== userId
+          );
+        });
+      } else {
+        console.error("Failed to accept friend request or server error");
       }
     } catch (error) {
       console.error("Failed to fetch [user]:", error);
@@ -125,7 +190,7 @@ export default function Profile({ params }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`/api/users?id=${userId}`, {
+        const response = await fetch(`/api/users/${userId}`, {
           method: "GET",
         });
         if (response.ok) {
@@ -146,9 +211,12 @@ export default function Profile({ params }) {
             ...initiatedFriendships,
             ...receivedFriendships,
           ];
-          const pendingFriends = receivedFriendships.map(
-            (friend) => friend["initiatorId"]
-          );
+          // const pendingFriends = receivedFriendships.map(
+          //   (friend) => friend["initiatorId"]
+          const pendingFriends = receivedFriendships
+            .filter((friend) => friend["status"] === "PENDING")
+            .map((friend) => friend?.recipientId ?? friend?.initiatorId);
+          // console.log("pendingFriends: ", pendingFriends);
           const acceptedFriends = combinedFriends
             .filter((friend) => friend["status"] === "ACCEPTED")
             .map((friend) => friend?.recipientId ?? friend?.initiatorId);
@@ -157,21 +225,34 @@ export default function Profile({ params }) {
           setPhoto(ProfileImage);
           setPrivate(status === "PRIVATE" ? true : false);
           setExperience(gymFrequency ?? "No experience set");
-          setFriendPending(pendingFriends);
+          //setFriendPending(pendingFriends);
           // setFriends(acceptedFriends);
           setEvent(HostEvents);
           setPostCreated(Post);
-          console.log("Accepted Friends", acceptedFriends)
+
+          // console.log(friendPending.length);
+
+          Promise.all(pendingFriends.map(fetchFriends)).then((listOfUsers) => {
+            // console.log("What ist his: ", listOfUsers);
+            const pendingFriends = listOfUsers.map((user) => ({
+              id: user.id,
+              name: user.name,
+              ProfileImage: user.ProfileImage,
+            }));
+            setFriendPending(pendingFriends);
+          });
+
           if (acceptedFriends.length > 0) {
-            Promise.all(acceptedFriends.map(fetchFriends)).then((listOfUsers) => {
-              console.log("What ist his: ", listOfUsers)
-              const actualFriends = listOfUsers.map((user) => ({
-                id: user.id,
-                name: user.name,
-                ProfileImage: user.ProfileImage
-              }));
-              setFriends(actualFriends);
-            });
+            Promise.all(acceptedFriends.map(fetchFriends)).then(
+              (listOfUsers) => {
+                const actualFriends = listOfUsers.map((user) => ({
+                  id: user.id,
+                  name: user.name,
+                  ProfileImage: user.ProfileImage,
+                }));
+                setFriends(actualFriends);
+              }
+            );
           }
         } else {
           console.error("Failed to get user data");
@@ -187,8 +268,6 @@ export default function Profile({ params }) {
     backgroundColor: "#003831",
     color: "white",
   };
-
-
 
   const handleSaveProfile = async () => {
     try {
@@ -231,7 +310,7 @@ export default function Profile({ params }) {
 
   const handlePhotoChange = (e) => {
     const selectedPhoto = e.target.files[0];
-    console.log(selectedPhoto);
+    // console.log(selectedPhoto);
     setPhoto(URL.createObjectURL(selectedPhoto));
   };
 
@@ -247,16 +326,78 @@ export default function Profile({ params }) {
     setExperience(e.target.value);
   };
 
+  const list = (anchor) => (
+    <Box
+      sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 250 }}
+      role="presentation"
+      onClick={toggleDrawer(anchor, false)}
+      onKeyDown={toggleDrawer(anchor, false)}
+    >
+      <div className="friendRequests">
+        <center>Pending Friend Requests</center>
+      </div>
+      <Divider />
+      <List>
+        {friendPending.map((friend, index) => (
+          <div key={index} className="friend">
+            <center>
+              <Button
+                href={`/profile/${friend.id}`}
+                style={{ textTransform: "none" }}
+              >
+                <Avatar
+                  alt="Profile"
+                  src={friend.ProfileImage}
+                  sx={{ width: 20, height: 20, marginRight: 1 }}
+                />
+                {friend.name}
+              </Button>
+              <IconButton aria-label="Accept" style={{ color: "#27632a" }} onClick={() => {
+                handleAcceptFriendRequest(friend.id)
+              }}>
+                <CheckIcon />
+              </IconButton>
+              <IconButton aria-label="Decline" style={{ color: "#d32f2f" }} onClick={() => {
+                handleDeclineFriendRequest(friend.id)
+              }}>
+                <CloseIcon />
+              </IconButton>
+            </center>
+          </div>
+        ))}
+      </List>
+    </Box>
+  );
+
   return (
     <div className="background">
       <div className="profile-container">
         <div className="profile-form">
+          <div className="top-right">
+            {userId === currentUserId
+              ? [<PersonAddIcon style={{ color: "#003831" }} />].map(
+                  (anchor) => (
+                    <>
+                      <Button onClick={toggleDrawer(anchor, true)}>
+                        {anchor}
+                      </Button>
+                      <Drawer
+                        anchor="right"
+                        open={state[anchor]}
+                        onClose={toggleDrawer(anchor, false)}
+                      >
+                        {list(anchor)}
+                      </Drawer>
+                    </>
+                  )
+                )
+              : null}
+          </div>
           <div className="profile-photo">
             <center>
               <Avatar
                 alt="Profile"
                 src={photo}
-                // src={URL.createObjectURL(photo)}
                 sx={{ width: 150, height: 150 }}
               />
               <input
@@ -282,18 +423,20 @@ export default function Profile({ params }) {
                 </label>
               )}
               {currentUserId === userId ? (
-                <Button
-                  className="spacing"
-                  variant="text"
-                  onClick={() => {
-                    toggleEditing();
-                    console.log("editing", isEditing);
-                    isEditing ? handleSaveProfile() : null;
-                  }}
-                  size="small"
-                >
-                  {isEditing ? "Save" : "Edit"}
-                </Button>
+                <div>
+                  <Button
+                    className="spacing"
+                    variant="text"
+                    onClick={() => {
+                      toggleEditing();
+                      console.log("editing", isEditing);
+                      isEditing ? handleSaveProfile() : null;
+                    }}
+                    size="small"
+                  >
+                    {isEditing ? "Save" : "Edit"}
+                  </Button>
+                </div>
               ) : null}
             </center>
           </div>
@@ -328,16 +471,21 @@ export default function Profile({ params }) {
               )}
             </div>
             <div className="profile-status">
-              {isEditing ? (<Button
-                className="spacing"
-                variant="contained"
-                onClick={isEditing ? toggleStatus : null}
-                size="small"
-                style={customButtonStyle}
-              >
-                {isPrivate ? "Private" : "Public"}
-              </Button>) : <item><b>{isPrivate ? "Private" : "Public"}</b></item>}
-              
+              {isEditing ? (
+                <Button
+                  className="spacing"
+                  variant="contained"
+                  onClick={isEditing ? toggleStatus : null}
+                  size="small"
+                  style={customButtonStyle}
+                >
+                  {isPrivate ? "Private" : "Public"}
+                </Button>
+              ) : (
+                <item>
+                  <b>{isPrivate ? "Private" : "Public"}</b>
+                </item>
+              )}
             </div>
           </div>
           <div className="middle">
@@ -391,22 +539,21 @@ export default function Profile({ params }) {
                       </b>
                     </center>
                     <div className="eventContent">
-                      {
-                        friends.map((friend, index) => (
-                          <div key={index} className="friend">
-                            <Button href={`/profile/${friend.id}`}
-                            style={{textTransform: 'none'}}
-                            >
-                              <Avatar
-                                alt="Profile"
-                                src={friend.ProfileImage}
-                                sx={{ width: 20, height: 20, marginRight: 1}}
-                              />
-                              {friend.name}
-
-                            </Button>
-                          </div>))
-                      }
+                      {friends.map((friend, index) => (
+                        <div key={index} className="friend">
+                          <Button
+                            href={`/profile/${friend.id}`}
+                            style={{ textTransform: "none" }}
+                          >
+                            <Avatar
+                              alt="Profile"
+                              src={friend.ProfileImage}
+                              sx={{ width: 20, height: 20, marginRight: 1 }}
+                            />
+                            {friend.name}
+                          </Button>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </CardContent>

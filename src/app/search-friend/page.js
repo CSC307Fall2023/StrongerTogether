@@ -14,6 +14,7 @@ export default function SearchFriends() {
   const [friendList, setfriendList] = useState([]);
   const [filteredFriends, setFilteredFriends] = useState([]);
   const [page, setPage] = useState(1);
+  // const [interactions, setInteractions] = useState(false);
   const itemsPerPage = 8;
   const dummyFriends = [
     {
@@ -85,6 +86,7 @@ export default function SearchFriends() {
   const handleInput = (e) => {
     const targetValue = e.target.value.toLowerCase();
     setInput(targetValue);
+    console.log(friendList)
     const newFriends = friendList.filter((element) => {
       if (targetValue === "") {
         return element;
@@ -93,7 +95,49 @@ export default function SearchFriends() {
       }
     });
     console.log("newFriends", newFriends);
+    setPage(1);
     setFilteredFriends(newFriends);
+  };
+
+  const handleFriendRequest = async (friendId) => {
+    try {
+      const response = await fetch(`/api/friendship`, {
+        method: "POST",
+        body: JSON.stringify({
+          "friendId": friendId,
+        })
+      });
+      if (response.ok) {
+        setFilteredFriends(filteredFriends.map(user => {
+          if (user.id === friendId) {
+            return { ...user, friendshipStatus: "PENDING" };
+          } else {
+            return user;
+          }
+        }));
+      } else {
+        console.log("Failed to fetch user data");
+      }
+    } catch (error) {
+      console.log("Failed to fetch user data");
+    }
+  }
+
+  const fetchFriends = async (userId) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: "POST",
+      });
+      if (response.ok) {
+        const userData = response.json();
+        return userData;
+
+      } else {
+        console.error("Failed to get user data");
+      }
+    } catch (error) {
+      console.error("Failed to fetch [user]:", error);
+    }
   };
 
   const handleChangePage = (event, newPage) => {
@@ -103,7 +147,7 @@ export default function SearchFriends() {
   useEffect(() => {
     const fetchPeople = async () => {
       try {
-        const response = await fetch("/api/friendship", {
+        const response = await fetch("/api/users", {
           method: "GET",
         });
         const data = await response.json();
@@ -111,7 +155,7 @@ export default function SearchFriends() {
         setfriendList(data);
         setFilteredFriends(data);
       } catch (error) {
-        console.error("Failed to fetch [posts]:", error);
+        console.error("Failed to fetch users:", error);
       }
     };
     fetchPeople();
@@ -133,25 +177,6 @@ export default function SearchFriends() {
       <Typography variant="h4" component={"h1"}>
         Search People
       </Typography>
-      {/* <Autocomplete
-        sx={{width: "60%", textAlign: "center"}}
-        disablePortal
-        id="combo-box-demo"
-        options={friendList.map((item) => item.name)}
-        onChange={handleInput}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            key = {params.id}
-            value = {input}
-            label="Search Friends"
-            onChange={handleInput}
-            sx={{
-              margin: '10px auto',
-            }}
-          />
-        )}
-      /> */}
       <TextField
         value={input}
         InputProps={{
@@ -168,7 +193,7 @@ export default function SearchFriends() {
           width: "60%",
         }}
       />
-      <FilterFriends searchstring={input} friendList={displayedFriends} />
+      <FilterFriends searchstring={input} friendList={displayedFriends} handleFriendRequest={handleFriendRequest} />
       <div className="pagination-container">
         <Pagination
           count={Math.ceil(filteredFriends.length / itemsPerPage)}

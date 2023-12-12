@@ -12,6 +12,62 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRETS,
 });
 
+export async function GET() {
+  // get all user data from the database who is not the current user
+  // authenticate the user before returning the informations
+  const loggedInData = await checkLoggedIn();
+  if (loggedInData.loggedIn) {
+    // find unique user that has the session id
+    const userId = loggedInData.user.id;
+    let Users;
+    try {
+      // check if it's an actual in the param or not:
+      // find every user and their friendships and return it
+      Users = await prisma.$queryRaw`
+             WITH 
+               "FriendsOngoing" AS (
+                  (
+                   SELECT "recipientId" AS "Friends"
+                   FROM "Friendship"
+                   WHERE "initiatorId" = ${userId} AND "status" = 'PENDING'
+                 )
+                UNION
+                 (                
+                   SELECT "initiatorId" AS "Friends"
+                   FROM "Friendship"
+                   WHERE "recipientId" = ${userId} AND "status" = 'PENDING'
+                 )
+               ),
+               "FriendsAccepted" AS (
+                  (
+                    SELECT "recipientId" AS "Friends"
+                    FROM "Friendship"
+                    WHERE "initiatorId" = ${userId} AND "status" = 'ACCEPTED'
+                  )
+                  UNION
+                  (                
+                    SELECT "initiatorId" AS "Friends"
+                    FROM "Friendship"
+                    WHERE "recipientId" = ${userId} AND "status" = 'ACCEPTED'
+                  )
+                )
+              SELECT "User"."name", "User"."id", "User"."ProfileImage", "User"."status",
+                    CASE 
+                    WHEN "User"."id" IN (SELECT "FriendsOngoing"."Friends" FROM "FriendsOngoing") THEN 'PENDING' 
+                    WHEN "User"."id" IN (SELECT "FriendsAccepted"."Friends" FROM "FriendsAccepted") THEN 'ACCEPTED' ELSE 'NONE' 
+                    END AS "friendshipStatus"
+              FROM "User"
+              WHERE "User"."id" != ${userId};
+           `;
+    } catch (e) {
+      console.log(e.message);
+      return NextResponse.json({ error: e.message }, { status: 500 });
+    }
+    console.log(Users);
+    return NextResponse.json(Users);
+  }
+  return USER_NOT_SIGNED_IN;
+}
 
 export async function POST(request) {
   /**
@@ -39,69 +95,18 @@ export async function POST(request) {
   return USER_NOT_SIGNED_IN;
 }
 
-export async function GET(request) {
-  // authenticate the user before returning the informations
-  const loggedInData = await checkLoggedIn();
-  const searchParams = request.nextUrl.searchParams;
-  console.log("searchParam", searchParams);
-  const userId = parseInt(searchParams.get("id"));
-  console.log("userId", userId);
-  if (true || loggedInData.loggedIn) {
-    // find unique user that has the session id
-    let user;
-    const checkUserById = !Number.isNaN(userId) ? userId : loggedInData.user.id;
-    console.log("checkUserById", checkUserById);
-    try {
-      // check if it's an actual in the param or not:
-      if (!isNaN(checkUserById)) {
-        user = await prisma.User.findUnique({
-          where: {
-            id: checkUserById,
-          },
-          select: {
-            id: true,
-            name: true,
-            shortBio: true,
-            ProfileImage: true,
-            gymFrequency: true,
-            status: true,
-            email: true,
-            HostEvents: true,
-            EventAttendee: true,
-            Post: true,
-            initiatedFriendships: {
-              select: {
-                status: true,
-                recipientId: true,
-              },
-            },
-            receivedFriendships: {
-              select: {
-                status: true,
-                initiatorId: true,
-              },
-            },
-          },
-        });
-      } else {
-        user = { error: "NaN id" };
-      }
-    } catch (e) {
-      console.log(e.message);
-      return NextResponse.json({ error: e.message }, { status: 500 });
-    }
-    console.log(user);
-    return NextResponse.json(user);
-  }
-  return USER_NOT_SIGNED_IN;
-}
-
 const uploadToCloudinary = async (imageURL) => {
   // create the image with a public_id as uuidv4()
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload(
       imageURL,
-      { public_id: uuidv4(), height: 150, width: 150, crop: "fill", quality: "auto"},
+      {
+        public_id: uuidv4(),
+        height: 150,
+        width: 150,
+        crop: "fill",
+        quality: "auto",
+      },
       (error, result) => {
         if (error) reject(error);
         else resolve(result);
@@ -113,9 +118,7 @@ const uploadToCloudinary = async (imageURL) => {
 const destroyCloudinary = async (public_id) => {
   // destroys the image using the public_id from the image
   return new Promise((resolve, reject) => {
-    cloudinary.uploader
-    .destroy(public_id)
-    .then((error, result) => {
+    cloudinary.uploader.destroy(public_id).then((error, result) => {
       if (error) reject(error);
       else resolve(result);
     });
@@ -124,7 +127,7 @@ const destroyCloudinary = async (public_id) => {
 
 function extractAfterLastSlashAndBeforeDot(str) {
   // Find the index of the last occurrence of '/'
-  const lastIndexSlash = str.lastIndexOf('/');
+  const lastIndexSlash = str.lastIndexOf("/");
 
   // If '/' is not found, return an empty string or the whole string
   if (lastIndexSlash === -1) return str;
@@ -133,7 +136,7 @@ function extractAfterLastSlashAndBeforeDot(str) {
   const substringAfterSlash = str.substring(lastIndexSlash + 1);
 
   // Find the index of the first occurrence of '.' in the substring
-  const lastIndexDot = substringAfterSlash.indexOf('.');
+  const lastIndexDot = substringAfterSlash.indexOf(".");
 
   // If '.' is not found, return the whole substring
   if (lastIndexDot === -1) return substringAfterSlash;
@@ -150,13 +153,14 @@ const checkImageExist = async (userId) => {
         id: userId,
       },
     });
-    if (imageToDelete?.ProfileImage) return extractAfterLastSlashAndBeforeDot(imageToDelete?.ProfileImage);
+    if (imageToDelete?.ProfileImage)
+      return extractAfterLastSlashAndBeforeDot(imageToDelete?.ProfileImage);
     else return null;
   } catch (e) {
     console.log(e.message);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
-}
+};
 
 export async function PUT(request) {
   // delete events and cascade delete all the event attendees
@@ -178,7 +182,7 @@ export async function PUT(request) {
 
     // create image using Cloudinary API
     const cloudinaryResult = await uploadToCloudinary(ProfileImage);
-    eventData.ProfileImage = cloudinaryResult.url;  // get the url created from the api to save into database
+    eventData.ProfileImage = cloudinaryResult.url; // get the url created from the api to save into database
     let updatdUser;
     try {
       updatdUser = await prisma.User.update({

@@ -17,7 +17,7 @@ export async function POST(request) {
       startTime: startTime,
       endTime: endTime,
       maxAttendee: parseInt(maxAttendee),
-      hostId: userId,
+      hostId: userId
     };
     
     // Check if filterIds array is not empty
@@ -35,13 +35,22 @@ export async function POST(request) {
     console.log(eventData);
     let events;
     try {
-      events = await prisma.Event.create({ data: eventData });
+      events = await prisma.Event.create({ 
+        data: eventData,
+        include: {
+          host: {
+            select: {
+              name: true
+            }
+          }
+        }
+      });
     } catch (e) {
       console.log(e);
       return NextResponse.json({ error: e.message }, { status: 500 });
     }
     // simple console.log logger (need to add an actual logger in the future)
-    console.log(events);
+    console.log("LOGGED EVENTS", events);
     return NextResponse.json(events);
   }
   return USER_NOT_SIGNED_IN;
@@ -82,13 +91,52 @@ export async function GET(request) {
                 },
               },
             },
+            host: {
+              select: {
+                name: true
+              }
+            },
+            EventAttendee: {
+              select: {
+                name: true
+              }
+            }
           },
           // order by the startTime and endTime in descending order 
           orderBy: [{ startTime: "desc" }, { endTime: "desc" }],
         });
       } else {
         // if no filter, return everything
-        allEvents = await prisma.Event.findMany();
+        allEvents = await prisma.Event.findMany(
+          {
+                      // include all the filters
+          include: {
+            EventFilter: {
+              select: {
+                possibleFilter: {
+                  select: {
+                    filterType: true,
+                  },
+                },
+              },
+            },
+            host: {
+              select: {
+                name: true
+              }
+            },
+            EventAttendee: {
+              select: {
+                user: {
+                  select: {
+                    name: true
+                  }
+                }
+              }
+            }
+          },
+          }
+        );
       }
     } catch (e) {
       console.log(e.message);
@@ -141,7 +189,7 @@ export async function PATCH(request) {
       location: location,
       startTime: startTime,
       endTime: endTime,
-      maxAttendee: maxAttendee,
+      maxAttendee: parseInt(maxAttendee),
       hostId: 1, // change this to something more dynamic
       EventFilter: {
         // add filters to the events and connect them to existing possible filters

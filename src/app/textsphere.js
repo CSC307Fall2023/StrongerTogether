@@ -31,10 +31,11 @@ const TextShpere = () => {
         "Rest Day",
         "Form",
         "Compound exercises",
+        
       ];
 
       const options = {
-        radius: 400,
+        radius: 700,
         maxSpeed: "fast",
         initSpeed: "fast",
         keep: true,

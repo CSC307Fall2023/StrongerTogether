@@ -23,6 +23,7 @@ body {
   height: 100%;
   width: 150px;
   background-color: var(--green);
+  z-index: 10; 
 }
 
 /* Full Navigation Container Styles */
@@ -221,7 +222,7 @@ body {
   color: white;
   border: none;
   border-radius: 5px;
-  margin: 0 10px;
+  margin-bottom: 10px;
 }
 
 .events-info-button:hover {
@@ -485,6 +486,7 @@ body {
 }
 
 .forum-post {
+  max-width: 600px;
   padding: 10px;
   border: 1px solid black;
   border-radius: 10px;

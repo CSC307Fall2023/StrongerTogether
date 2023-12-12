@@ -38,14 +38,14 @@ async function createOrDeleteVotes(model, where, data) {
 
 // Not a good practice, but this POST api is for both creation and detion of votes
 export async function POST(request) {
-  // const loggedInData = await checkLoggedIn(); // check user sign in
-  if (true) {
+  const loggedInData = await checkLoggedIn(); // check user sign in
+  if (loggedInData.loggedIn) {
     // if user is logged in, then create the event if needed
     const responseData = await request.json();
     const { voteType, postId } = responseData;
     // create data layout for post creation
     const checkVoteData = {
-      userId: 1, // make this dynamic
+      userId: loggedInData.user.id,
       postId: postId,
     };
 

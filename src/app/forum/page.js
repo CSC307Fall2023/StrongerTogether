@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import CommentIcon from '@mui/icons-material/Forum';
@@ -7,70 +8,18 @@ import FlagIcon from '@mui/icons-material/Flag';
 import '../globals.css'; 
 
 const Forum = () => {
-  // const samplePosts = [
-  //   {
-  //     title: 'Lost My Gains!',
-  //     author: 'GymNoob',
-  //     tags: ['Fitness', 'Gym'],
-  //     likes: 16,
-  //     dislikes: 2,
-  //     comments: 4,
-  //   },
-  //   {
-  //     title: 'The Great Protein Shake Debate',
-  //     author: 'ShakeLover',
-  //     tags: ['Protein', 'Humor'],
-  //     likes: 32,
-  //     dislikes: 1,
-  //     comments: 7,
-  //   },
-  //   {
-  //     title: 'How to Avoid Eye Contact at the Gym',
-  //     author: 'GymHider',
-  //     tags: ['Gym', 'Etiquette'],
-  //     likes: 19,
-  //     dislikes: 0,
-  //     comments: 3,
-  //   },
-  //   {
-  //     title: 'Cardio vs. Lifting',
-  //     author: 'FitFreak',
-  //     tags: ['Cardio', 'Lifting'],
-  //     likes: 45,
-  //     dislikes: 4,
-  //     comments: 12,
-  //   },
-  //   {
-  //     title: 'Disappearing Gym Socks',
-  //     author: 'SockDetective',
-  //     tags: ['Funny', 'Gym'],
-  //     likes: 22,
-  //     dislikes: 3,
-  //     comments: 5,
-  //   },
-  //   {
-  //     title: 'Muscles: How Many Are Too Many?',
-  //     author: 'MuscleMania',
-  //     tags: ['Muscles', 'Humor'],
-  //     likes: 38,
-  //     dislikes: 2,
-  //     comments: 8,
-  //   },
-  //   {
-  //     title: 'Protein Powder: A Love Story',
-  //     author: 'ProteinAddict',
-  //     tags: ['Protein', 'Love'],
-  //     likes: 33,
-  //     dislikes: 2,
-  //     comments: 7,
-  //   },
-  // ];
-
   const [postTitle, setPostTitle] = useState('');
   const [postDescription, setPostDescription] = useState('');
   const [showNewPostPopup, setShowNewPostPopup] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTagsIds, setSelectedTagsIds] = useState([]);
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [selectedFiltersIds, setSelectedFiltersIds] = useState([]); // Filtering posts by tags
   const [posts, setPosts] = useState([]);
+  const [userInteraction, setUserInteraction] = useState(false);
+
+  const { data : session, status} = useSession();
+  let userId = session?.user?.id;
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -86,7 +35,7 @@ const Forum = () => {
       }
     };
     fetchPosts();
-  }, []);
+  }, [userInteraction]);
 
   const handleNewPostClick = () => {
     setShowNewPostPopup(true);
@@ -111,11 +60,16 @@ const Forum = () => {
 
       if (response.ok) {
         const updatedPost = await response.json();
+        updatedPost.postTitle = posts.find((post) => post.id === postId).postTitle;
+        updatedPost.authorId = posts.find((post) => post.id === postId).authorId;
+        updatedPost.total_vote = posts.find((post) => post.id === postId).total_vote;
+        console.log("Updated Post =", updatedPost);
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
             post.id === updatedPost.id ? updatedPost : post
           )
         );
+        setUserInteraction(!userInteraction);
       } else {
         console.error('Failed to update like count');
       }
@@ -137,11 +91,15 @@ const Forum = () => {
 
       if (response.ok) {
         const updatedPost = await response.json();
+        updatedPost.postTitle = posts.find((post) => post.id === postId).postTitle;
+        updatedPost.authorId = posts.find((post) => post.id === postId).authorId;
+        updatedPost.total_vote = posts.find((post) => post.id === postId).total_vote;
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
             post.id === updatedPost.id ? updatedPost : post
           )
         );
+        setUserInteraction(!userInteraction);
       } else {
         console.error('Failed to update like count');
       }
@@ -150,32 +108,73 @@ const Forum = () => {
     }
   };
 
-  const tagOptions = [
-    'General',
-    'Discussions',
-    'Sports',
-    'Exercise',
-    'ASI',
-    'Events',
-    // Add more tags as needed
-  ];
+  const tagOptions = {
+    "General": 1,
+    "Discussions": 2,
+    "Sports": 3,
+    "Exercise": 4,
+    "ASI": 5,
+    "Events": 6,
+  };
 
   const handleTagChange = (tag) => {
+    let newSelectedTags;
     // Toggle the selected state of the tag
     if (selectedTags.includes(tag)) {
-      setSelectedTags((prevSelected) => prevSelected.filter((selectedTag) => selectedTag !== tag));
+      newSelectedTags = selectedTags.filter((selectedTag) => selectedTag !== tag);
     } else {
-      setSelectedTags((prevSelected) => [...prevSelected, tag]);
+      newSelectedTags = [...selectedTags, tag];
     }
-  };
+    setSelectedTags(newSelectedTags); 
+
+    const selectedTagsIds = newSelectedTags.map((tag) => tagOptions[tag]);
+    setSelectedTagsIds(selectedTagsIds);
+  
+    console.log("Selected tags", newSelectedTags);
+    console.log("Selected tags ids", selectedTagsIds);
+    };
+
+    const isPostInSelectedFilters = (post) => {
+      if (selectedFiltersIds.length === 0) {
+        return true;
+      }
+      if (!post.filters || post.filters.length === 0) {
+        return false;
+      }
+
+      for (let filter of post.filters) {
+        if (selectedFiltersIds.includes(filter.FilterId)) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+  const handleFilterChange = (filter) => {
+    let newSelectedFilters;
+    if (selectedFilters.includes(filter)) {
+      newSelectedFilters = selectedFilters.filter(f => f !== filter);
+    } else {
+      newSelectedFilters = [...selectedFilters, filter];
+    }
+  
+    const newSelectedFiltersIds = newSelectedFilters.map(f => tagOptions[f]);
+    setSelectedFilters(newSelectedFilters);
+    setSelectedFiltersIds(newSelectedFiltersIds);
+  
+    console.log("Selected filters", newSelectedFilters);
+    console.log("Selected filters ids", newSelectedFiltersIds);
+  }; 
   
   const handleNewPostSubmit = async () => {
-    // Perform validation
+    console.log("Selected tags ids", selectedTagsIds);
     const response = await fetch("/api/forums", {
       method: "POST",
       body: JSON.stringify({
         postTitle: postTitle,
         postDescription: postDescription,
+        authorId: userId,
+        filterIds: selectedTagsIds,
       }),
     });
 
@@ -184,6 +183,8 @@ const Forum = () => {
       posts.push({
         postTitle: postTitle,
         postDescription: postDescription,
+        authorId: userId,
+        PostFilters: selectedTagsIds,
       });
     }
 
@@ -210,14 +211,18 @@ const Forum = () => {
           </button>
           <div className="filters-box">
             <h2>Filters</h2>
-            <ul>
-              <li>General</li>
-              <li>Discussions</li>
-              <li>Sports</li>
-              <li>Exercise</li>
-              <li>ASI</li>
-              <li>Events</li>
-            </ul>
+            {Object.keys(tagOptions).map((tag, index) => (
+              <div key={index}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selectedFilters.includes(tag)}
+                    onChange={() => handleFilterChange(tag)}
+                  />
+                  {tag}
+                </label>
+              </div>
+            ))}
           </div>
           <div className="my-options-box">
             <h2>My Options</h2>
@@ -229,13 +234,14 @@ const Forum = () => {
           </div>
         </div>
         <div className="forum-post-container">
-          {posts.map((post, index) => (
+          {posts.filter(isPostInSelectedFilters).map((post, index) => (
             <div className="forum-post" key={index}>
               <div className="post-details">
                 <h3 className="post-title">{post.postTitle}</h3>
                 <div className='post-author-tags'>
-                  <p className="post-author">Posted by: {post.authorId}</p>
-                  <p className="post-tags">Tags: {post.PostFilters && Array.isArray(post.PostFilters) ? post.PostFilters.join(', ') : ''}</p>
+                  <p className="post-author">Posted by: {post.name}</p>
+                  {/* <p className="post-tags">Tags: {post.PostFilters && Array.isArray(post.PostFilters) ? post.PostFilters.join(', ') : ''}</p> */}
+                  <p className="post-votes">Votes: {post.total_vote}</p>
 
                 </div>
               </div>
@@ -284,7 +290,7 @@ const Forum = () => {
                   <h5>(Select 1 to 2)</h5>
                 </div>
                 <div className="tag-buttons">
-                  {tagOptions.map((tag, index) => (
+                  {Object.keys(tagOptions).map((tag, index) => (
                     <label key={index} className="tag-button">
                       <input
                         type="checkbox"
@@ -297,19 +303,13 @@ const Forum = () => {
                 </div>
              </div>
             <div className="button-container">
-              <button className="draft-button" onClick={handleClosePopup}>Save as Draft</button>
+              {/* <button className="draft-button" onClick={handleClosePopup}>Save as Draft</button> */}
               <button className="submit-button" onClick={handleNewPostSubmit}>Submit</button>
             </div>
           </div>
         </div>
       )}
-
       </div>
-
-
-      
-
-
     </div>
   );
 };

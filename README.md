@@ -8,6 +8,35 @@ First, get a database running. You will need Docker installed on your machine.
 docker-compose up
 ```
 
+Extra Note on error messages:
+
+If running docker-compose up causes this error message:
+```
+Error response from daemon: driver failed programming external connectivity on endpoint strongertogether-db-1 (3e34b4cc5af11e1260570363f3db3c67af670fc30cff08e2fa2117114ffbcb3c): Bind for 0.0.0.0:5432 failed: port is already allocated
+```
+Check out the StackOverFlow if needed or follow the steps below: [Docker Error](https://stackoverflow.com/a/63819488)
+
+Follow these steps to fix it:
+
+**Step-1: check all the running containers using the command:**
+
+```
+docker ps
+```
+
+**Step-2: Find out the container id of the container which is running on the same port, you are trying to reach.**
+
+**Step-3: Stop the container which one is running on the same port using this command:**
+
+```
+docker stop <container id>
+```
+
+**Step-4: Compose Docker again**
+```bash
+docker-compose up
+```
+
 Then, make sure all your node modules are installs
 
 ```bash

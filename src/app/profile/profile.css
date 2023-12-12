@@ -1,4 +1,3 @@
-
 .profile-container {
     display: flex;
     align-items: center;
@@ -20,13 +19,13 @@
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     /*max-width: 1500px;*/
     min-height: 50px;
-    height: 90vh;
+    height: flex;
     width: 100%;
     margin-top: 1%;
 }
 
-.profile-photo{
-    position:relative
+.profile-photo {
+    position: relative
 }
 
 .profile-photo img {
@@ -35,16 +34,16 @@
     border-radius: 70%;
     display: block;
     margin-bottom: 10px;
-    position:relative
+    position: relative
 }
 
 .spacing {
-    position:relative;
+    position: relative;
     margin-top: 10px;
 }
 
 .font {
-    font-size:x-large;
+    font-size: x-large;
     top: 15px;
 }
 
@@ -65,43 +64,43 @@ input[type="file"] {
 
 
 .select-wrapper {
-  position: relative;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
-  padding: 5px;
-  display: flex;
-  justify-content: center;
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
 }
 
 .select-wrapper select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  cursor: pointer;
-  background-color: transparent;
-  border: none;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    outline: none;
 }
 
 
 /* Style the options */
 .select-wrapper select option {
-  padding: 15px;
-  font-size: 16px;
-  background-color: #fff;
-  color: #333;
+    padding: 15px;
+    font-size: 16px;
+    background-color: #fff;
+    color: #333;
 }
 
 /* Hover effect on options */
 .select-wrapper select option:hover {
-  background-color: #f0f0f0;
+    background-color: #f0f0f0;
 }
 
-.option-frequency{
+.option-frequency {
     text-align: center;
 }
 
@@ -111,28 +110,66 @@ input[type="file"] {
     margin-top: 20px;
 }
 
-.bottom-cards-container > div {
+.bottom-cards-container>div {
     width: 100%;
     margin-right: 10px;
     margin-left: 10px;
     box-shadow: 0 0 4px #003831;
-    /*border: 1px solid #A89968;*/
     height: auto;
-    
-    transition: transform 0.5s ease-in-out, box-shadow 0.3s ease-in-out;
+
+    transition: transform .1s ease-in-out, box-shadow 0.3s ease-in-out;
 
     &:hover {
-        transform: scale(1.2); 
+        transform: scale(1.05);
         box-shadow: 0 0 15px #A89968;
     }
 }
 
 
 .eventContent .title {
-    font-weight: bold; 
+    font-weight: bold;
+    text-align: left;
+    font-size: medium;
 }
 
 .eventContent .body {
-    color: #5b5959
+    color: #5b5959;
+    text-align: left;
+    font-size: small
 }
 
+
+.mini-profile-photo {
+    position: relative
+}
+
+.mini-profile-photo img {
+    max-width: 150px;
+    height: 150px;
+    border-radius: 70%;
+    display: block;
+    margin-bottom: 10px;
+    position: relative
+}
+
+.friendRequests {
+    font-size: x-large;
+    top: 15px;
+    font-weight: bold;
+}
+
+.friendRequestItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.top-right {
+    position: relative;
+    justify-content: right;
+    left: 45%;
+    /* padding: 10px 20px; */
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+}

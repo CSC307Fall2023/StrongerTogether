@@ -239,7 +239,7 @@ const Forum = () => {
               <div className="post-details">
                 <h3 className="post-title">{post.postTitle}</h3>
                 <div className='post-author-tags'>
-                  <p className="post-author">Posted by: {post.authorId}</p>
+                  <p className="post-author">Posted by: {post.name}</p>
                   {/* <p className="post-tags">Tags: {post.PostFilters && Array.isArray(post.PostFilters) ? post.PostFilters.join(', ') : ''}</p> */}
                   <p className="post-votes">Votes: {post.total_vote}</p>
 

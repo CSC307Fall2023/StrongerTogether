@@ -13,20 +13,20 @@ async function check_friends_exist(currentUserId, friendId) {
         initiatorId_recipientId: {
           initiatorId: currentUserId,
           recipientId: friendId,
-        }
+        },
       },
     });
-    console.log("userAsInitiator", userAsInitiator)
+    console.log("userAsInitiator", userAsInitiator);
     if (userAsInitiator) return { type: "initiator" }; // user is initiator of friendId
     const userAsRecipient = await prisma.Friendship.findUnique({
       where: {
         initiatorId_recipientId: {
           initiatorId: friendId,
           recipientId: currentUserId,
-        }
+        },
       },
     });
-    console.log("userAsRecipient", userAsInitiator)
+    console.log("userAsRecipient", userAsInitiator);
     if (userAsRecipient) return { type: "recipient" }; // user is recipient of friendId
   } catch (e) {
     console.log(e);
@@ -97,7 +97,7 @@ export async function POST(request) {
 //         // get back all related friends of either initiator or recipient that have an accepted status
 //         case "ACCEPTED":
 //           friends = await prisma.$queryRaw`
-//             WITH 
+//             WITH
 //               "AcceptedFriends" AS (
 //                 (
 //                   SELECT "recipientId" AS "Friends"
@@ -105,7 +105,7 @@ export async function POST(request) {
 //                   WHERE "initiatorId" = ${userId} AND "status" = 'ACCEPTED'
 //                 )
 //                 UNION
-//                 (                
+//                 (
 //                   SELECT "initiatorId" AS "Friends"
 //                   FROM "Friendship"
 //                   WHERE "recipientId" = ${userId} AND "status" = 'ACCEPTED'
@@ -119,7 +119,7 @@ export async function POST(request) {
 //         default:
 //           // Grab all users who are not currently pending or accepted
 //           friends = await prisma.$queryRaw`
-//             WITH 
+//             WITH
 //               "FriendsOngoing" AS (
 //                 (
 //                   SELECT "recipientId" AS "Friends"
@@ -127,7 +127,7 @@ export async function POST(request) {
 //                   WHERE "initiatorId" = ${userId}
 //                 )
 //                 UNION
-//                 (                
+//                 (
 //                   SELECT "initiatorId" AS "Friends"
 //                   FROM "Friendship"
 //                   WHERE "recipientId" = ${userId}
@@ -160,7 +160,7 @@ export async function PUT(request) {
       initiatorId_recipientId: {
         initiatorId,
         recipientId: userId,
-      }
+      },
     };
     let acceptedFriend;
     try {
@@ -170,6 +170,15 @@ export async function PUT(request) {
         },
         data: {
           status: "ACCEPTED",
+        },
+        include: {
+          initiator: {
+            select: {
+              id: true,
+              name: true,
+              ProfileImage: true,
+            },
+          },
         },
       });
     } catch (e) {
@@ -188,7 +197,7 @@ export async function DELETE(request) {
     const responseData = await request.json();
     const userId = loggedInData.user.id;
     const { friendId } = responseData;
-    let unfriend
+    let unfriend;
     try {
       const check_exist = await check_friends_exist(userId, friendId);
       // check both as initiator and as recipient
@@ -197,14 +206,14 @@ export async function DELETE(request) {
           initiatorId_recipientId: {
             initiatorId: userId,
             recipientId: friendId,
-          }
+          },
         };
         unfriend = await prisma.Friendship.delete({
           where: {
             ...friendToDeleteAsInitiator,
           },
         });
-        unfriend.message = "Friend Deleted :("
+        unfriend.message = "Friend Deleted :(";
       }
       // if the friendship is as a recipient, delete it as recipient
       if (check_exist && check_exist.type === "recipient") {
@@ -212,20 +221,20 @@ export async function DELETE(request) {
           initiatorId_recipientId: {
             initiatorId: friendId,
             recipientId: userId,
-          }
+          },
         };
         unfriend = await prisma.Friendship.delete({
           where: {
             ...friendsToDeleteAsRecipient,
           },
         });
-        unfriend.message = "Friend Deleted :("
+        unfriend.message = "Friend Deleted :(";
       }
 
       if (check_exist === null) {
         unfriend = {
-          message: "No Friends to Delete"
-        }
+          message: "No Friends to Delete",
+        };
       }
     } catch (e) {
       console.log(e.message);

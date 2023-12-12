@@ -15,12 +15,12 @@ export async function POST(request) {
   if (true) {
     // if user is logged in, then create the event if needed
     const responseData = await request.json();
-    const { postTitle, postDescription, filterIds=null } = responseData;
+    const { postTitle, postDescription, filterIds=null, authorId } = responseData;
     // create data layout for post creation
     const postData = {
       postTitle: postTitle,
       postDescription: postDescription,
-      authorId: 1, // change this to something more dynamic
+      authorId: authorId, // change this to something more dynamic
     };
     console.log("filterId", filterIds)
     if (filterIds && filterIds.length > 0) {

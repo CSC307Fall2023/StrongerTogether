@@ -4,8 +4,8 @@ import { USER_NOT_SIGNED_IN } from "@/lib/response";
 import { checkLoggedIn } from "@/lib/auth";
 
 export async function POST(request) {
-  // const loggedInData = await checkLoggedIn(); // check user sign in
-  if (true) {
+  const loggedInData = await checkLoggedIn(); // check user sign in
+  if (loggedInData.loggedIn) {
     // if user is logged in, then create the event if needed
     const responseData = await request.json();
     const { postId, possibleFilterId } = responseData;
@@ -30,13 +30,13 @@ export async function POST(request) {
 
 export async function GET(request) {
   // send in GET request as query in URL
-  // const loggedInData = await checkLoggedIn();
-  if (true) {
-    const searchParams = request.nextUrl.searchParams;
+  const loggedInData = await checkLoggedIn();
+  if (loggedInData.loggedIn) {
+    // const searchParams = request.nextUrl.searchParams;
     // Get all 'filters' query parameters as an array
-    let filters = searchParams.getAll("filters");
-    filters = filters.map((value) => parseInt(value));
-    console.log(filters)
+    // let filters = searchParams.getAll("filters");
+    // filters = filters.map((value) => parseInt(value));
+    // console.log(filters)
     let forums;
     const filtersArrayString = `{${filters.join(',')}}`;
     try {

@@ -480,13 +480,15 @@ body {
 
 .forum-post-container {
   display: grid;
-  flex-wrap: wrap;
+  grid-template-columns: 1fr;
   gap: 20px;
-  min-width: 86%;
+  align-items: start;
+  justify-content: start;
+  width: 86%;
 }
 
 .forum-post {
-  max-width: 600px;
+  width: 100%;
   padding: 10px;
   border: 1px solid black;
   border-radius: 10px;

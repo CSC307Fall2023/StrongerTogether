@@ -545,7 +545,7 @@ const Events = () => {
               </Button>
             </div>
             <Dialog open={open} onClose={handleClose}>
-              <DialogTitle className="events-title-popup">Add New Event</DialogTitle>
+              <DialogTitle className="events-title-popup">{editIndex !== null ? "Edit Event" : "Add New Event"}</DialogTitle>
               <DialogContent className="event-popup">
                 <div className="event-popup-item">
                   <h3 className="popup-item-text">Title: </h3>
@@ -609,6 +609,7 @@ const Events = () => {
                     margin="normal"
                     label="Max Attendees"
                     name="maxAttendee"
+                    inputProps={{ type: 'number', min: "0"}}
                     value={newEvent.maxAttendee}
                     onChange={handleInputChange}
                     fullWidth
@@ -634,7 +635,7 @@ const Events = () => {
                   onClick={handleAddEvent}
                   color="primary"
                 >
-                  Add
+                  {editIndex !== null ? "Edit" : "Add"}
                 </Button>
               </DialogActions>
             </Dialog>

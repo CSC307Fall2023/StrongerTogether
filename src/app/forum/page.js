@@ -226,11 +226,11 @@ const Forum = () => {
               </div>
             ))}
           </div>
-          <div className="my-options-box">
+          {/* <div className="my-options-box">
               <div className="option-buttons">
                 <button className="my-posts-button">My Posts</button>
               </div>
-          </div>
+          </div> */}
         </div>
         <div className="forum-post-container">
           {posts.filter(isPostInSelectedFilters).map((post, index) => (

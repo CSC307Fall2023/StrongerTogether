@@ -175,6 +175,7 @@ export async function PATCH(request) {
   const loggedInData = await checkLoggedIn();
   if (loggedInData.loggedIn) {
     const responseData = await request.json();
+    const userId = loggedInData.user.id;
     const {
       id,
       eventName,
@@ -190,7 +191,7 @@ export async function PATCH(request) {
       startTime: startTime,
       endTime: endTime,
       maxAttendee: parseInt(maxAttendee),
-      hostId: 1, // change this to something more dynamic
+      hostId: userId, // change this to something more dynamic
       EventFilter: {
         // add filters to the events and connect them to existing possible filters
         create: filterIds.map((id) => ({

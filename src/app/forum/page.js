@@ -20,6 +20,8 @@ const Forum = () => {
 
   const { data : session, status} = useSession();
   let userId = session?.user?.id;
+  console.log("current session user id", userId);
+  
 
   useEffect(() => {
     const fetchPosts = async () => {

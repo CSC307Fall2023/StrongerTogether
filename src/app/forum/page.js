@@ -268,7 +268,6 @@ const Forum = () => {
           ))}
         </div>
 
-
         {showNewPostPopup && (
         <div className="new-post-popup">
           <div className="popup-content">

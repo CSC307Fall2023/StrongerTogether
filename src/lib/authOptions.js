@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/db";
 
 const authOptions = {
-  debug: true,
+  debug: process.env.NODE_ENV !== "production",
   providers: [ CredentialsProvider({
     id: 'normal',
     name: "Email / Password",

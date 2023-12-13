@@ -545,44 +545,55 @@ const Events = () => {
               </Button>
             </div>
             <Dialog open={open} onClose={handleClose}>
-              <DialogTitle className="events-title">Add New Event</DialogTitle>
-              <DialogContent>
-                <TextField
-                  margin="normal"
-                  label="Title"
-                  name="title"
-                  value={newEvent.title}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-                <TextField
-                  margin="normal"
-                  label="Date"
-                  name="date"
-                  type="date"
-                  value={newEvent.date}
-                  onChange={handleInputChange}
-                  fullWidth
-                  placeholder="MM/DD/YYYY"
-                />
-                <TextField
-                  margin="normal"
-                  label="Start Time"
-                  name="startTime"
-                  type="time"
-                  value={newEvent.startTime}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-                <TextField
-                  margin="normal"
-                  label="End Time"
-                  name="endTime"
-                  type="time"
-                  value={newEvent.endTime}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
+              <DialogTitle className="events-title-popup">{editIndex !== null ? "Edit Event" : "Add New Event"}</DialogTitle>
+              <DialogContent className="event-popup">
+                <div className="event-popup-item">
+                  <h3 className="popup-item-text">Title: </h3>
+                  <TextField
+                    margin="normal"
+                    label="Title"
+                    name="title"
+                    value={newEvent.title}
+                    onChange={handleInputChange}
+                    fullWidth
+                  />
+                </div>
+                <div className="event-popup-item">
+                  <h3 className="popup-item-text">Date: </h3>
+                  <TextField
+                    margin="normal"   
+                    name="date"
+                    type="date"
+                    value={newEvent.date}
+                    onChange={handleInputChange}
+                    fullWidth
+                    placeholder="MM/DD/YYYY"
+                  />
+                </div>
+                <div className="event-popup-item">
+                  <h3 className="popup-item-text">Start Time: </h3>
+                  <TextField
+                    margin="normal"             
+                    name="startTime"
+                    type="time"
+                    value={newEvent.startTime}
+                    onChange={handleInputChange}
+                    fullWidth
+                  />
+                </div>
+                <div className="event-popup-item">
+                  <h3 className="popup-item-text">End Time: </h3>
+                  <TextField
+                    margin="normal"
+                    name="endTime"
+                    type="time"
+                    value={newEvent.endTime}
+                    onChange={handleInputChange}
+                    fullWidth
+                  />
+                </div>
+                <div className="event-popup-item">
+                <h3 className="popup-item-text">Location: </h3>
                 <TextField
                   margin="normal"
                   label="Location"
@@ -591,14 +602,20 @@ const Events = () => {
                   onChange={handleInputChange}
                   fullWidth
                 />
-                <TextField
-                  margin="normal"
-                  label="Max Attendees"
-                  name="maxAttendee"
-                  value={newEvent.maxAttendee}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
+                </div>
+                <div className="event-popup-item">
+                  <h3 className="popup-item-text">Max Attendees: </h3>
+                  <TextField
+                    margin="normal"
+                    label="Max Attendees"
+                    name="maxAttendee"
+                    inputProps={{ type: 'number', min: "0"}}
+                    value={newEvent.maxAttendee}
+                    onChange={handleInputChange}
+                    fullWidth
+                  />
+                </div>
+               
                 {errorMessage && (
                   <Typography color="error">
                     {errorMessage}
@@ -618,7 +635,7 @@ const Events = () => {
                   onClick={handleAddEvent}
                   color="primary"
                 >
-                  Add
+                  {editIndex !== null ? "Edit" : "Add"}
                 </Button>
               </DialogActions>
             </Dialog>

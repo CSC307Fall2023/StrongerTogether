@@ -375,7 +375,7 @@ export default function Profile({ params }) {
         <div className="profile-form">
           <div className="top-right">
             {userId === currentUserId
-              ? [<PersonAddIcon style={{ color: "#003831" }} />].map(
+              ? [<PersonAddIcon key={userId} style={{ color: "#003831" }} />].map(
                   (anchor) => (
                     <>
                       <Button onClick={toggleDrawer(anchor, true)}>

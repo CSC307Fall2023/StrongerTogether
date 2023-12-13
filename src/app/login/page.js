@@ -187,6 +187,15 @@ export default function LoginPage() {
                   value={userEmail}
                   onChange={(e) => setUserEmail(e.target.value)}
                 />
+                {isRegistering && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ marginBottom: 2 }}
+                  >
+                    Password must be 8 or more characters.
+                  </Typography>
+                )}
                 <TextField
                   label="Password"
                   variant="outlined"

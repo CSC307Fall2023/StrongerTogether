@@ -250,6 +250,7 @@ VALUES
 
 INSERT INTO "Post" ("postTitle", "postDescription", "authorId")
 VALUES
-('Title of Post 1', 'Description of Post 1', 1),
-('Title of Post 2', 'Description of Post 2', 2),
-('Title of Post 3', 'Description of Post 3', 3);
+('24 Hour Rec Renter Challenge (Gone Wrong)', 'This weekend, I took on the 24-Hour Rec Renter Challenge, a whole day at the gym! Started at 6 am with my trusty beanbag, planning to get some work done. Ended up mostly snacking on random protein bars I found lying around. Got caught by an employee while I was catching some Zs in the locker room floor at 2 am. Guess Ill just try again next weekend.', 1),
+('Got Banned From The Rec Center :( ', 'So, Im not allowed back at the rec center. Cant spill all the details, but lets just say my last workout was a bit too much for them. Its like a one-way ticket to Banville. Farewell, rec center. My bad.', 2),
+('I Cant Stop Giving Unsolicited Gym Advice', 'Its weird, but I cant stop myself from giving gym advice, whether you want it or not. Seriously, its like a joy addiction. Picture me dropping exercise tips mid-burpee, during water breaks, and even in the locker room. Im that guy. ', 3),
+('Just one cycle?', 'Okay, so, hear me out. With beach season creeping up, Im contemplating this idea: just one cycle of anabolic steroids. Its like standing at the edge of a diving board, unsure whether to take the plunge or not. Is it a shortcut to gains or a detour into the unknown?', 4);

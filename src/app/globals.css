@@ -714,3 +714,7 @@ textarea {
   align-items: center;
   display: flex;
 }
+
+.post-author, .post-votes {
+  margin: 5px;
+}

@@ -227,11 +227,8 @@ const Forum = () => {
             ))}
           </div>
           <div className="my-options-box">
-            <h2>My Options</h2>
               <div className="option-buttons">
                 <button className="my-posts-button">My Posts</button>
-                <button className="my-saved-button">My Saved</button>
-                <button className="my-drafts-button">My Drafts</button>
               </div>
           </div>
         </div>
@@ -239,13 +236,13 @@ const Forum = () => {
           {posts.filter(isPostInSelectedFilters).map((post, index) => (
             <div className="forum-post" key={index}>
               <div className="post-details">
-                <h3 className="post-title">{post.postTitle}</h3>
+                <h1 className="post-title">{post.postTitle}</h1>
                 <div className='post-author-tags'>
-                  <p className="post-author">Posted by: {post.name}</p>
+                  <h3 className="post-author">Posted by: {post.name}</h3>
                   {/* <p className="post-tags">Tags: {post.PostFilters && Array.isArray(post.PostFilters) ? post.PostFilters.join(', ') : ''}</p> */}
-                  <p className="post-votes">Votes: {post.total_vote}</p>
-
+                  <h3 className="post-votes">Votes: {post.total_vote}</h3>
                 </div>
+                <p className="post-description">{post.postDescription}</p>
               </div>
               <div className="post-actions">
                 <button className="like-button"  onClick={() => handleLikeClick(post.id)}>

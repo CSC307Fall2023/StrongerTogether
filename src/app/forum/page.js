@@ -256,13 +256,6 @@ const Forum = () => {
                   <ThumbDownIcon />
                   <span className="action-count">{post.dislikes}</span>
                 </button>
-                <button className="comment-button">
-                  <CommentIcon />
-                  <span className="action-count">{post.comments}</span>
-                </button>
-                <button className="flag-button">
-                  <FlagIcon style={{ color: 'red' }}/>
-                </button>
               </div>
             </div>
           ))}

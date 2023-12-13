@@ -200,6 +200,21 @@ body {
   padding-bottom: 25px;
 }
 
+.events-title-popup {
+  text-align: center;
+  background-color: var(--green);
+  color: white;
+  padding: 20px;
+  padding-bottom: 10px;
+  width: 600px;
+  font-size: 2rem;
+}
+
+.popup-item-text{
+  width: 220px;
+}
+
+
 .events-button {
   background: var(--green);
   color: white;
@@ -521,7 +536,7 @@ body {
   justify-content: right;
 }
 
-.like-button, .dislike-button, .comment-button, .flag-button {
+.like-button, .dislike-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -536,7 +551,7 @@ body {
   transition: transform 0.1s;
 }
 
-.like-button:hover, .dislike-button:hover, .comment-button:hover, .flag-button:hover {
+.like-button:hover, .dislike-button:hover {
   transform: scale(1.02);
   background-color: rgb(219, 219, 219);
 }
@@ -688,4 +703,14 @@ textarea {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+}
+
+.event-popup h3{
+  margin: 0;
+  padding: 0;
+}
+
+.event-popup-item {
+  align-items: center;
+  display: flex;
 }

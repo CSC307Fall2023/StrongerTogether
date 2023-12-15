@@ -43,7 +43,7 @@ Then, make sure all your node modules are installs
 npm install
 ```
 
-Next, make sure you modify the .env file to have the correct information for database connection. 
+Next, make sure you modify the .env file to have the correct information for database connection. The information is in our cover letter we submitted.
 
 Make sure the database is migrated. 
 

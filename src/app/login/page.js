@@ -300,13 +300,13 @@ export default function LoginPage() {
                         </Typography>
                       }
                     />
-                    <Link
+                    {/* <Link
                       href="#"
                       variant="body2"
                       sx={{ fontSize: "0.8rem", alignSelf: "center" }}
                     >
                       Forgot password?
-                    </Link>
+                    </Link> */}
                   </Box>
                 )}
                 <Button

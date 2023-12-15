@@ -345,18 +345,46 @@ const Events = () => {
     }
   };
 
+  const convertDateToInputFormat = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
+  
+  const convertTimeToInputFormat = (timeString) => {
+    const match = timeString.match(/(\d+):(\d+)(am|pm)/i);
+    if (!match) {
+      return null; // or throw an error if invalid format
+    }
+    let [_, hours, minutes, partOfDay] = match;
+    hours = parseInt(hours, 10);
+    if (partOfDay.toLowerCase() === 'pm' && hours < 12) {
+      hours += 12;
+    } else if (partOfDay.toLowerCase() === 'am' && hours === 12) {
+      hours = 0;
+    }
+  
+    const formattedHours = String(hours).padStart(2, '0');
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    return `${formattedHours}:${formattedMinutes}`;
+  };
+
+
   const handleEditEvent = (index) => {
     const eventToEdit = events[index];
     if (eventToEdit.hostId === userId) {
       setEditIndex(index);
-      setNewEvent(eventToEdit);
+      setNewEvent({
+        ...eventToEdit,
+        date: convertDateToInputFormat(eventToEdit.date),
+        startTime: convertTimeToInputFormat(eventToEdit.startTime),
+        endTime: convertTimeToInputFormat(eventToEdit.endTime),
+      });
       setOpen(true);
     } else {
       console.log("You are not authorized to edit this event.");
     }
   };
 
-  // Function to handle "Interested" click
   const handleInterested = async (index) => {
     const updatedEvents = [...events];
     const userInteracted = userInteractions[index]?.interested || false;
